@@ -1,4 +1,4 @@
-port sys
+import sys
 
 class Node(object):
     def __init__(self, item, children):
