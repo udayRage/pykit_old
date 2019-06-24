@@ -1,1 +1,1 @@
-python fpgrowth_basic.py path_to_dataset min_supp (in percentage)
+python3 fpgrowth_basic.py path_to_dataset min_supp (in percentage)
