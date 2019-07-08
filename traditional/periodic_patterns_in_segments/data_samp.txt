@@ -1,0 +1,17 @@
+1 a c
+2 b d g
+3 b d
+7 a
+9 b e f
+10 c
+11 e
+12 d f
+13 a
+14 b d e
+15 b f
+16 c g
+17 e
+18 d f
+19 a c
+20 b d
+21 b d
