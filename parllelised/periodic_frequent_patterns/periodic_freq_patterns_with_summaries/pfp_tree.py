@@ -127,6 +127,6 @@ class Node(object):
 class Summary(object):
 
         def __init__(self, count, nodes):
-                self.count = count
-                self.nodes = nodes
-                self.tids = set()
+            self.count = count
+            self.nodes = nodes
+            self.tids = set()
