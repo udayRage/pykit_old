@@ -23,9 +23,9 @@ PAMI_PyKit stands for PAttern MIning  Python Kit. It contains a set of python li
 12. partialPeriodicFrequentPattern-growth using multiple period-supports (PPFPgrowth_MPS)
 13. recurringPattern-growth (RP-growth)
 14. HighUtilityItemsetMining (EFIM)
-15. HighUtilityFrequentItemsetMining (EFIM++)
+15. HighUtilityFrequentItemsetMining (EFIMpp)
 16. SpatialHighUtilityItemsetMining  
-
+17. PartialPeriodicSpatialPatternMining ()
 ## Parallel algorithms
 1. parallelFrequentPatternGrowth
 2. parallel PeriodicFrequentPatternGrowth
