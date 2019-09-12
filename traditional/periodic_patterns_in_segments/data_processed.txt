@@ -1,6 +1,0 @@
-1 a1 c1 b2 d2 g2 b3 d3
-3 a1 b3 e3 f3
-4 c1 e2 d3 f3
-5 a1 b2 d2 e2 b3 f3
-6 c1 g1 e2 d3 f3
-7 a1 c1 b2 d2 b3 d3
