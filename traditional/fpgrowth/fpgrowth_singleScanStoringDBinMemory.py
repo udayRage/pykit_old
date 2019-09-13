@@ -4,7 +4,7 @@ genelist=[]
 with open(sys.argv[1],'r') as f:
     lno=0
     for line in f:
-        li=line.split(",") 
+        li=line.split() 
         list_of_transactions.append(li)
         lno=lno+1 
     f.close()
@@ -142,13 +142,7 @@ def main():
     generated_dict=generate_dict(list_of_transactions) #returns freq items and support; dictionary
     global genelist
     genelist=update_hash(generated_dict)
-    rank = dict([(index,item) for (item,index) in enumerate(genelist)]) #
-    # print(rank) 
-    # print(genelist)
-    print("#########")
-    #print("NO of singleitems:",end='')
-    print(len(genelist))
-    print("#########")
+    rank = dict([(index,item) for (item,index) in enumerate(genelist)]) 
     updated_transactions1=update_transactions1(list_of_transactions,generated_dict,rank)
     Tree = build_tree(updated_transactions1)
     q=Tree.generate_patterns([]) #send prefix as empty
