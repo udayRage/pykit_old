@@ -73,8 +73,7 @@ class Tree(object):
             sup_i=self.verify_sup(i)
             pattern=prefix.copy()
             pattern.append(genelist[i])
-            yield (pattern,sup_i)
-            print(pattern)                        
+            yield (pattern,sup_i)                       
             con_patterns,freq_list=self.get_condition_pattern(i)
             conditional_tree=Tree() 
             for pat in range(len(con_patterns)): 
