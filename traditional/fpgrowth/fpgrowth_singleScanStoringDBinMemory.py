@@ -4,7 +4,7 @@ genelist=[]
 with open(sys.argv[1],'r') as f:
     lno=0
     for line in f:
-        li=line.split() 
+        li=line.split(",") 
         list_of_transactions.append(li)
         lno=lno+1 
     f.close()
