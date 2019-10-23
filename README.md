@@ -8,7 +8,7 @@ PAMI_PyKit stands for PAttern MIning  Python Kit. It contains a set of python li
 
 
 
-## Sequential algorithms
+## Traditional (or sequential) algorithms
 1. frequentPatternGrowth (FPgrowth)
 2. multipleSupportFrequentPatternGrowth using user specified minimum item supports (MSFPgrowth) 
 3. multipleSupportFrequentPatternGrowth using percentage based function (IMSFPgrowth)
