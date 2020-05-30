@@ -6,5 +6,3 @@ after typing command enter customized membership values
 sample run:
 python3 perfuzzy.py fuz_pol.txt 16 100 op
 
-
-there are some prints ignore them ****
