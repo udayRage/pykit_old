@@ -46,7 +46,7 @@ if __name__=="__main__":
     APP_NAME = "FPGrowth"
 
     conf = SparkConf().setAppName(APP_NAME)
-    # conf = conf.setMaster("local[*]")
+    conf = conf.setMaster("local[*]")##comment this if working on server
 
 
     sc  = SparkContext(conf=conf)
