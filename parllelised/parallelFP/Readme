@@ -1,1 +1,5 @@
 python3 parallelfpGrowth.py #inputdatafile# #output folder# #minsup(in %)# #no of machines#
+
+or 
+
+time python3 parallelfpGrowth.py #inputdatafile# #output folder# #minsup(in %)# #no of machines#
