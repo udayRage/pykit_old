@@ -3,3 +3,10 @@ python3 parallelfpGrowth.py #inputdatafile# #output folder# #minsup(in %)# #no o
 or 
 
 time python3 parallelfpGrowth.py #inputdatafile# #output folder# #minsup(in %)# #no of machines#
+
+
+-----------------------
+Note: If you are encountering sparkConf error, Please add the below lines in the begining of the parallelfpgrowth.py program
+
+import findspark
+findspark.init()
