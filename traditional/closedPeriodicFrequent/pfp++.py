@@ -6,8 +6,8 @@ from collections import defaultdict
 
 path = sys.argv[1]
 outfile= sys.argv[2]
-periodicity = int(sys.argv[3])
-minSup=float(sys.argv[4])
+minSup=float(sys.argv[3])
+periodicity = int(sys.argv[4])
 
 
 class Node(object):
