@@ -16,6 +16,7 @@ class Node(object):
         self.parent = None
         self.tids = []
         self.sup=0
+        self.last=0
 
     def addChild(self, node):
         self.children[node.item] = node
@@ -26,10 +27,36 @@ class Tree(object):
         	self.summaries = {}
         	self.info={}
 	def add_transaction(self,transaction,tid):
-       	 	curr_node=self.root
+		if type(tid)==int:
+       	 		curr_node=self.root
+        		for i in range(len(transaction)):
+            			if transaction[i] not in curr_node.children:
+                			new_node=Node(transaction[i],{})
+                			curr_node.addChild(new_node)
+                			if transaction[i] in self.summaries:
+                    				self.summaries[transaction[i]].append(new_node)
+                			else:
+                    				self.summaries[transaction[i]]=[new_node]                    
+                			curr_node=new_node                
+            			else:
+                			curr_node=curr_node.children[transaction[i]] 
+       			curr_node.sup+=1
+       			n=len(curr_node.tids)-1  
+       			if(curr_node.tids==[]):
+        			curr_node.tids.insert(n,[tid,tid,0])
+       			else:
+        			lp=abs(curr_node.last-tid)
+        			if(lp>maxperiod):
+        				curr_node.tids.insert(n+1,[tid,tid,0])
+        			else:
+        				curr_node.tids[n][2]=max(curr_node.tids[n][2],lp)
+        				curr_node.tids[n][1]=tid
+        		curr_node.last=tid
+	def addTransaction(self,transaction,tid,sup):
+       		curr_node=self.root
         	for i in range(len(transaction)):
             		if transaction[i] not in curr_node.children:
-                		new_node=Node(transaction[i],{})
+               	 		new_node=Node(transaction[i],{})
                 		curr_node.addChild(new_node)
                 		if transaction[i] in self.summaries:
                     			self.summaries[transaction[i]].append(new_node)
@@ -37,36 +64,9 @@ class Tree(object):
                     			self.summaries[transaction[i]]=[new_node]                    
                 		curr_node=new_node                
             		else:
-                		curr_node=curr_node.children[transaction[i]] 
-       		curr_node.sup+=1
-       		n=len(curr_node.tids)-1  
-       		if(curr_node.tids==[]):
-        		curr_node.tids.insert(n,[tid,tid,0,tid])
-       		else:
-        		lp=abs(curr_node.tids[n][3]-tid)
-        		if(lp>maxperiod):
-        			curr_node.tids.insert(n+1,[tid,tid,0,tid])
-        		else:
-        			curr_node.tids[n][2]=max(curr_node.tids[n][2],lp)
-        			curr_node.tids[n][1]=tid
-        			curr_node.tids[n][3]=tid
-	def addTransaction(self,transaction):
-       		sp=[i.item for i in transaction]
-       		curr_node=self.root
-       		n=transaction[len(transaction)-1]
-        	for i in range(len(transaction)-1):
-            		if transaction[i].item not in curr_node.children:
-               	 		new_node=Node(transaction[i].item,{})
-                		curr_node.addChild(new_node)
-                		if transaction[i].item in self.summaries:
-                    			self.summaries[transaction[i].item].append(new_node)
-                		else:
-                    			self.summaries[transaction[i].item]=[new_node]                    
-                		curr_node=new_node                
-            		else:
-                		curr_node=curr_node.children[transaction[i].item]
-                curr_node.sup=n.sup
-             	curr_node.tids=n.tids
+                		curr_node=curr_node.children[transaction[i]]
+                curr_node.sup=sup
+             	curr_node.tids=tid
        	def get_condition_pattern(self,alpha):
         	final_patterns=[]
         	final_sets=[]
@@ -75,16 +75,15 @@ class Tree(object):
             		q= self.genrate_tids(i)
             		set1=i.tids
             		s=i.sup 
-            		sup.append(s)
             		set2=[]
-            		set2.append(i)
             		while(i.parent.item!=None):
-                		set2.append(i.parent)
+                		set2.append(i.parent.item)
                 		i=i.parent
             		if(len(set2)>0):
                 		set2.reverse()
                 		final_patterns.append(set2)
                 		final_sets.append(set1)
+                		sup.append(s)
         	final_patterns,final_sets,info,support=cond_trans(final_patterns,final_sets,sup)
         	return final_patterns,final_sets,info,support
     
@@ -94,8 +93,25 @@ class Tree(object):
     	def remove_node(self,node_val):
         	for i in self.summaries[node_val]:
             		i.parent.sup+=i.sup
-            		i.parent.tids+=i.tids
-    							
+            		#i.parent.tids=i.parent.tids+i.tids
+            		#print i.parent.tids,"...",i.tids
+            		if i.parent.tids==[]:
+            			i.parent.tids=i.parent.tids+i.tids
+            		else:
+            			for k in i.tids:
+            				for j in i.parent.tids:
+            					if k[0]<j[0] and k[1]<j[1]:
+            						lp=abs(k[1]-j[0])
+            						if lp<=maxperiod:
+            							j[0]=min(k[0],j[0])
+            							j[1]=max(k[1],j[1])
+            							j[2]=lp
+            					elif k[0]>j[0]:
+            						lp=abs(k[1]-j[0])
+            						if lp<=maxperiod:
+            							j[0]=min(k[0],j[0])
+            							j[1]=max(k[1],j[1])
+            							j[2]=lp
             		del i.parent.children[node_val]
             		i=None
                 
@@ -105,6 +121,8 @@ class Tree(object):
             		pattern=prefix[:]
             		pattern.append(i)
             		if tuple(pattern) not in periodic:
+            			st=saveperiodic(pattern)
+            			#print st,self.info.get(i)
             			periodic[tuple(pattern)]=self.info.get(i)
             			yield pattern
             		t1=[]
@@ -114,27 +132,57 @@ class Tree(object):
             			conditional_tree=Tree()
             			conditional_tree.info=info.copy()
             			for pat in range(len(patterns)):
-            				if len(patterns[pat])>1:
-                				conditional_tree.addTransaction(patterns[pat])
+                			conditional_tree.addTransaction(patterns[pat],tids[pat],support[pat])
             			if(len(patterns)>0):
                 			for q in conditional_tree.generate_patterns(pattern):
                     				yield q
             		self.remove_node(i)
-
+def Merge(tids):
+	s1=[]
+	s2=[]
+	if len(tids)>1:
+		s=sorted(tids,key=lambda x:x[0][1])
+		for i in range(len(s)-1):
+			j=i+1	
+			if s[i][0]<s[j][0]:
+				temp=s[i]
+				s[i]=s[j]
+				s[j]=temp
+				
+			if s[i][0]>s[j][0]:
+				s1=[[s[j][0][0],s[i][0][1],abs(s[i][0][1]-s[j][0][0])]]
+			elif s[i][1]>s[j][1]:
+				d=s[i][0][1]+maxperiod
+				s1=[s[i][0][0],s[i][0][1],s[i][0][2]]
+			elif s[i][0][1]+maxperiod>=s[j][0][0]:
+				s1=[[s[j][0][0],s[j][0][1],s[j][0][2]]]
+			else:
+				s1.append([s[i][0][0],s[i][0][1],s[i][0][2]])
+				s1.append([s[j][0][0],s[j][0][1],s[j][0][2]])
+	s=sorted(tids,key=lambda x:x[0][1])
+	if len(s)==1:
+		for x in s:
+			s2=s2+x			
+		for i in range(len(s2)-1):
+			j=i+1
+			m=min(s2[i][0],s2[j][0])
+			m1=max(s2[i][1],s2[j][1])
+			lp=abs(s2[i][1]-s2[j][0])	
+			s1=[[m,m1,lp]]
+	return s1
 def getPer_Sup(tids,sup):
     s=[]
-    s1=0
     apt=0
     x=[]
-    tids.sort()
-    #print tids,len(tids),sup
-    if len(tids)>1:
-    	for i in range(len(tids)-1):
-    		j=i+1
-    		for k in range(len(tids[i])):
-    			if tids[i][k][0]<tids[j][k][0]<tids[i][k][1]:
-    				apt=abs(tids[i][k][1]-tids[j][k+1][0])
-    return [sup,apt]     
+    s1=Merge(tids)
+    if len(s1)==1:
+    	x=x+s1
+    	#print x
+    	if x[0][0]<=maxperiod:
+    		s2=lno-x[0][1]
+    		if s2<=maxperiod:
+    			apt=x[0][2]
+    return [sup,apt]
 def cond_trans(cond_pat,cond_tids,sup):
     pat=[]
     tids=[]
@@ -143,28 +191,25 @@ def cond_trans(cond_pat,cond_tids,sup):
     support={}
     for i in range(len(cond_pat)):
         for j in cond_pat[i]:
-            if j.item in data1:
-                data1[j.item].append(cond_tids[i])
-                support[j.item]+=sup[i]
-                #data1[j][1]+=sup[i]
+            if j in data1:
+                data1[j].append(cond_tids[i])
+                support[j]+=sup[i]
             else:
-                data1[j.item]=[cond_tids[i]]
-                support[j.item]=sup[i] 
+                data1[j]=[cond_tids[i]]
+                support[j]=sup[i] 
     up_dict={}
     for m in data1:
-        up_dict[m]=getPer_Sup(data1[m],support[m])
+    	up_dict[m]=getPer_Sup(data1[m],support[m])
     up_dict={k: v for k,v in up_dict.items() if v[0]>=minsup and v[1]<=maxperiod}
     count=0
     for p in cond_pat:
-        p1=[v for v in p if v.item in up_dict]
-        #print p1
+        p1=[v for v in p if v in up_dict]
         trans=sorted(p1)
-        #print trans
         if(len(trans)>0):
             pat.append(trans)
             tids.append(cond_tids[count])
         count+=1
-    return pat,tids,up_dict,support
+    return pat,tids,up_dict,sup
 def generate_dict(transactions):
     global rank
     data={}
@@ -181,7 +226,6 @@ def generate_dict(transactions):
 
     data={k: [v[2],v[0]] for k,v in data.items() if v[0]<=maxperiod and v[2]>=minsup}
     genList=[k for k,v in sorted(data.items(),key=lambda x: x[1],reverse=True)]
-    #print(genList)
     rank = dict([(index,item) for (item,index) in enumerate(genList)])
     return data,genList
 def update_transactions1(list_of_transactions,dict1,rank):
@@ -202,7 +246,6 @@ def build_tree(data,info):
     root_node.info=info.copy()
     for i in range(len(data)):
         set1=[]
-        #set1.append(data[i][0])
         root_node.add_transaction(data[i][1:],data[i][0])
     return root_node
 lno=1
@@ -224,7 +267,6 @@ def main():
     maxperiod=int(math.ceil(maxperiod*lno)/100)
     print(minsup,maxperiod)
     generated_dict,pfList=generate_dict(list_of_transactions)
-    #print rank
     print("No. of single items:",len(pfList))
     updated_transactions1=update_transactions1(list_of_transactions,generated_dict,rank)
     for x,y in rank.items():
@@ -234,9 +276,6 @@ def main():
     print 
     list_of_transactions=[]
     Tree = build_tree(updated_transactions1,info)
-    #for x,y in Tree.summaries.items():
-    	#for i in y:
-    		#print x,i.item,i.parent.item,i.sup,i.tids
     intpat=Tree.generate_patterns([])
     return intpat
 def saveperiodic(itemset):
@@ -260,6 +299,6 @@ if(__name__ == "__main__"):
     		frequentitems+=1
     endtime=int(round(time.time()*1000))
     temp=endtime-starttime
-    print("Periodic frequentitems",periodicitems)
+    print("Periodic frequentitems",frequentitems)
     print("time taken:",temp)
     print("MemorySpcae",resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
