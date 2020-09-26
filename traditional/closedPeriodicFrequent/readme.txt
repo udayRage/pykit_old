@@ -1,1 +1,1 @@
-python cpfp.py **inputfile **outputfile **minsup **maxperiod
+python CPFP-Miner.py **inputfile **outputfile **minsup **maxperiod
