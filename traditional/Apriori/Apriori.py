@@ -9,9 +9,8 @@ endTime = float
 
 
 class Apriori:
-    """
+    """ main apriori class"""
 
-    """
 
     def __init__(self, iFile, minSup):
         self.iFile = iFile
@@ -20,14 +19,14 @@ class Apriori:
         self.finalFps = {}
 
     def cList2FpList(self, cList):
-        """
+        """Generates frequent item sets from the candidate item sets
 
         :param cList: Candidate item sets will be given as input
         :type cList: list
         :return: returning set of all frequent item sets
         :rtype: dict
-
         """
+
         c2FList = {}
         for i in self.transaction:
             dictionary = {frozenset(j): int(c2FList.get(frozenset(j), 0)) + 1 for j in cList if j.issubset(i)}
@@ -36,15 +35,16 @@ class Apriori:
         return c2FList
 
     def fpList2CList(self, fpList, length):
-        """
+        """Generates candidate item sets from the frequent item sets
+
         :param fpList: set of all frequent item sets to generate candidate item sets of each of size is length
         :type fpList: dict
         :param length: size of each candidate item sets to be generated
         :type length: int
         :return: set of candidate item sets in sorted order
         :rtype: list
-
         """
+
         fp2CList = []
         # list = []
         # fp2CList = [set(c) for c in combinations(a,length) if c not in fp2CList]
@@ -54,9 +54,8 @@ class Apriori:
         return sorted(fp2CList)
 
     def startMine(self):
-        """ frequent pattern mining process will start from here
+        """ frequent pattern mining process will start from here"""
 
-        """
         global startTime, endTime
         startTime = time.time()
         fileName = self.iFile
@@ -82,9 +81,8 @@ class Apriori:
         endTime = time.time()
 
     def getMemory(self):
-        """Calculating the amount of memory consumed by the Apriori algorithm
+        """Calculating the amount of memory consumed by the Apriori algorithm"""
 
-        """
         # import psutil
         # global minSup
         process = psutil.Process(os.getpid())
@@ -95,16 +93,13 @@ class Apriori:
         # print("Total Memory is:", memoryInMb)
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm
+        """Calculating the total amount of execution time taken by the Apriori algorithm"""
 
-        """
         global endTime, startTime
         return endTime - startTime
 
     def getPatternInDf(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file
-
-        """
+        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
         df = {}
         data = []
@@ -118,7 +113,6 @@ class Apriori:
 
         :param oFile: .csv input file path
         :type oFile: file
-
         """
 
         writer = open(oFile, 'w+')
@@ -133,6 +127,6 @@ class Apriori:
 
         :return: returning frequent item sets
         :rtype: dict
-
         """
+
         return self.finalFps
