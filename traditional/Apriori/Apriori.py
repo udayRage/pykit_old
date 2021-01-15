@@ -111,7 +111,7 @@ class Apriori:
     def getPatternsInFile(self, oFile):
         """Main apriori function receiving input file path, list of minimum support values, nodes, and nonLeaf
 
-        :param oFile: .csv input file path
+        :param oFile: .csv output file name
         :type oFile: file
         """
 
