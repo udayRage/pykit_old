@@ -60,3 +60,4 @@ for i in range(1, noOfItems):
     # print("\nCandidate Items of length:",i+1,"\n-----------------------------")
     for ci in cList:
         print(sorted(list(ci)))
+print("Total number of patterns:", len(finalFps))
