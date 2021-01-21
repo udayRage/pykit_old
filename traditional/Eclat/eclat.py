@@ -27,7 +27,7 @@ class Eclat():
         self.tidList={k:v for k,v in self.tidList.items() if len(v)>=self.minSup}
         for x,y in self.tidList.items():
             self.totalItemsets[x]=len(y)
-    def generate2Length_FrequentPatterns(self,tids): 
+    def generateTwoLengthFrequentPatterns(self,tids): 
          tidList1={}
          x=list(tids.keys())
          for i in range(0,len(x)):
