@@ -1,1 +1,4 @@
-python3 eclat.py *inputFileName *outputFileName *minSup(in count)
+Execution : python3 eclat.py *inputFileName *outputFileName *minSup
+*inputFileName : Transactional Database file
+*outputFileName : Any file name where you want to store the frequent patterns
+*minSup : minimum support in count (Ex: 100,900,800)
