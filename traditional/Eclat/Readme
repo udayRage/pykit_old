@@ -3,4 +3,4 @@ Execution : python3 eclat.py *inputFileName *outputFileName *minSup
 *outputFileName : Any file name where you want to store the frequent patterns
 *minSup : minimum support in count (Ex: 100,900,800)
 
-Sample Execution : python3 eclat.py T10I4D1000K.txt output 1000
+Sample Execution : python3 eclat.py T10I4D100K.txt output 1000
