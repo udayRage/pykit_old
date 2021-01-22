@@ -1,132 +1,73 @@
 import time
-import pandas as pd
+import sys
 import os
-import os.path
 import psutil
 
-startTime = float
-endTime = float
+
+def candidateListToFrequentList(candidateList):
+    frequentSetSup = {}
+    for transactionItems in transaction:
+        dictionary = {frozenset(candidateSet): int(frequentSetSup.get(frozenset(candidateSet), 0))+1
+                      for candidateSet in candidateList if candidateSet.issubset(transactionItems)}
+        frequentSetSup.update(dictionary)
+    frequentSetSup = {key: value for key, value in frequentSetSup.items() if value >= minSupport}
+    return frequentSetSup
 
 
-class Apriori:
-    """ main apriori class"""
+def frequentListToCandidateList(frequentList, length):
+    candidateList = []
+    # candidateList = [set(c) for c in combinations(a,length) if c not in candidateList]
+    for item1 in frequentList:
+        temporaryList = [item1 | item2 for item2 in frequentList if len(item1 | item2) == length
+                         and (item1 | item2) not in candidateList]
+        candidateList.extend(temporaryList)
+        
+    return sorted(candidateList)
 
 
-    def __init__(self, iFile, minSup):
-        self.iFile = iFile
-        self.minSup = minSup
-        self.transaction = []
-        self.finalFps = {}
+startTime = time.time()
+inputFileName = (sys.argv[1])
+outputFileName = (sys.argv[2])
+with open(inputFileName, 'r') as file:
+    transaction = [set(line.split()) for line in file]
 
-    def cList2FpList(self, cList):
-        """Generates frequent item sets from the candidate item sets
+itemsList = sorted(list(set.union(*transaction)))
+items = [{item} for item in itemsList]
+itemsLength = len(items)
+frequentSets = {}
+numberOfFrequent = {}
+totalFrequentSet = 0
+lengthOfLastFrequentSet = 0
+minSupport = float(sys.argv[3])
+# support_counter = [[0 for x in range(1000)] for y in range(1000)]
 
-        :param cList: Candidate item sets will be given as input
-        :type cList: list
-        :return: returning set of all frequent item sets
-        :rtype: dict
-        """
+file = open(outputFileName, 'w+')
+print(minSupport)
+# f.write('{0}\n'.format(minSupport))
+for i in range(1, itemsLength):
+    frequentItemSets = candidateListToFrequentList(items)
+    if len(frequentItemSets) == 0:
+        print("No frequentPatterns")
+    numberOfFrequent[i] = len(frequentItemSets)
+    for frequentSet in frequentItemSets:
+        file.write('{0}, Support Count = {1}\n'.format(sorted(frequentSet), frequentItemSets[frequentSet]))
+        # print(sorted(li)," Support Count = ",l[li])
+    frequentSets.update(frequentItemSets)
+    items = frequentListToCandidateList(frequentItemSets, i + 1)
+    if len(items) == 0:
+        lengthOfLastFrequentSet = i
+        print("End of Frequent Item Sets")
+        break
+        # finish apriori
 
-        c2FList = {}
-        for i in self.transaction:
-            dictionary = {frozenset(j): int(c2FList.get(frozenset(j), 0)) + 1 for j in cList if j.issubset(i)}
-            c2FList.update(dictionary)
-        c2FList = {key: value for key, value in c2FList.items() if value >= self.minSup}
-        return c2FList
+process = psutil.Process(os.getpid())
+memory = process.memory_full_info().uss
+memoryInMB = memory / (1024 * 1024)
+print("Total Memory consumed by the program is:", memoryInMB)
 
-    def fpList2CList(self, fpList, length):
-        """Generates candidate item sets from the frequent item sets
-
-        :param fpList: set of all frequent item sets to generate candidate item sets of each of size is length
-        :type fpList: dict
-        :param length: size of each candidate item sets to be generated
-        :type length: int
-        :return: set of candidate item sets in sorted order
-        :rtype: list
-        """
-
-        fp2CList = []
-        # list = []
-        # fp2CList = [set(c) for c in combinations(a,length) if c not in fp2CList]
-        for i in fpList:
-            nextList = [i | j for j in fpList if len(i | j) == length and (i | j) not in fp2CList]
-            fp2CList.extend(nextList)
-        return sorted(fp2CList)
-
-    def startMine(self):
-        """ frequent pattern mining process will start from here"""
-
-        global startTime, endTime
-        startTime = time.time()
-        fileName = self.iFile
-        with open(fileName, 'r') as f:
-            self.transaction = [set(line.split(',')) for line in f]
-            f.close()
-
-        itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
-        items = [{i} for i in itemsList]
-        itemsCount = len(items)
-
-        for i in range(1, itemsCount):
-            fpSet = self.cList2FpList(items)
-            if len(fpSet) == 0:
-                print("No frequent sets")
-            for li in fpSet:
-                print(sorted(li), "Support Count = ", fpSet[li])
-            self.finalFps.update(fpSet)
-            items = self.fpList2CList(fpSet, i + 1)
-            if len(items) == 0:
-                print("End of Frequent Item Sets")
-                break  # finish apriori'''
-        endTime = time.time()
-
-    def getMemory(self):
-        """Calculating the amount of memory consumed by the Apriori algorithm"""
-
-        # import psutil
-        # global minSup
-        process = psutil.Process(os.getpid())
-        memory = process.memory_full_info().uss  # process.memory_info().rss
-        memoryInMb = memory / (1024 * 1024)
-        return memoryInMb
-        # print(memoryInMb)  # in bytes
-        # print("Total Memory is:", memoryInMb)
-
-    def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm"""
-
-        global endTime, startTime
-        return endTime - startTime
-
-    def getPatternInDf(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
-
-        df = {}
-        data = []
-        for a, b in self.finalFps.items():
-            data.append([a, b])
-            df = pd.DataFrame(data, columns=['Patterns', 'Support'])
-        return df
-
-    def getPatternsInFile(self, oFile):
-        """Main apriori function receiving input file path, list of minimum support values, nodes, and nonLeaf
-
-        :param oFile: .csv output file name
-        :type oFile: file
-        """
-
-        writer = open(oFile, 'w+')
-        for x, y in self.finalFps.items():
-            # s = "output" + str(x)
-            s1 = str(x) + ":" + str(y)
-            writer.write("%s \n" % s1)
-        # InFile()
-
-    def getFPs(self):
-        """ Function to send the set of frequent item sets after completion of the mining process
-
-        :return: returning frequent item sets
-        :rtype: dict
-        """
-
-        return self.finalFps
+for i in range(1, lengthOfLastFrequentSet + 1):
+    print('f{0} = {1}'.format(i, numberOfFrequent[i]))
+    totalFrequentSet = totalFrequentSet + numberOfFrequent[i]
+print('total items = {0}'.format(totalFrequentSet))
+print('total execution time = {0}'.format(time.time() - startTime))
+file.close()
