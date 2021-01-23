@@ -235,7 +235,6 @@ class Apriori(frequentPatterns):
         # print(line)
         for i in l:
             if i in line:
-                # print(i)
                 return i
         return j
 
@@ -289,10 +288,10 @@ class Apriori(frequentPatterns):
             try:
                 with open(iFileName, 'r', encoding='utf-8') as f:
                     for line in f:
-                        line.strip()
+                        #line.strip()
                         if lno == 0:
                             lno += 1
-                            delimiter = self.check(line)
+                            delimiter = self.check([*line])
                             # li=[lno]
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
@@ -553,3 +552,4 @@ class Apriori(frequentPatterns):
         global finalPatterns
 
         return finalPatterns
+
