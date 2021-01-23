@@ -1,8 +1,7 @@
 from abstract import *
 
-
-startTime = float
-endTime = float
+# startTime = float
+# endTime = float
 itemSets = defaultdict()
 
 # Input for Hash mod function f(x) mod No_of_children
@@ -31,7 +30,7 @@ class Tree(object):
 
         Methods
         -------
-        createChildren(NoOfChild)
+        createChildren(noOfChildren)
             creating children to hash tree
         setChildrenValue(data_list)
             Attach the list of data values into the children of the tree
@@ -40,11 +39,11 @@ class Tree(object):
             is performed based on level attribute
         insertion(data, level)
             Inserting data into a particular node in a particular level of the hash tree
-        first_element(self, data)
+        firstElement(self, data)
             Inserting the first element into the hash tree
-        Tree_display(parent, length)
+        treeDisplay(parent, length)
             Displaying the content of the tree based on the total number of elements and parent node
-        Tree_search(self, element)
+        treeSearch(self, element)
             Searching a particular element in a hash tree
     """
 
@@ -56,28 +55,28 @@ class Tree(object):
 
     # Creating the children of a particular node
 
-    def createChildren(self, NoOfChild):
-        """Creating children to the hash tree total of NoOfChild
+    def createChildren(self, noOfChildren):
+        """Creating children to the hash tree total of noOfChildren
 
-        :param NoOfChild: it represents the total number of children to the hash tree at each level
-        :type NoOfChild: int
+        :param noOfChildren: it represents the total number of children to the hash tree at each level
+        :type noOfChildren: int
         """
 
         self.leaf = False
-        for i in range(0, NoOfChild):
+        for i in range(0, noOfChildren):
             self.child.append(Tree())
 
     # Adding values to the tree node
 
-    def setChildrenValue(self, data_list):
+    def setChildrenValue(self, dataList):
         """ Attach the list of data values into the children of the tree
 
-        :param data_list: item set in a list format
-        :type data_list: list
+        :param dataList: item set in a list format
+        :type dataList: list
         :return: returns the number of data elements in a child node of a hash tree as a rowcount
         :rtype: int
         """
-        self.data.append(data_list)
+        self.data.append(dataList)
         rows = len(self.data)
         return rows
 
@@ -95,7 +94,7 @@ class Tree(object):
 
         :param level: level of the hash tree to identify the depth of the tree
         :type level: int
-        
+
         """
 
         self.level = level
@@ -137,7 +136,7 @@ class Tree(object):
             self.child[indexing].insertion(data, level)
 
     # Inserting the data into the tree starting with root node
-    def first_element(self, data):
+    def firstElement(self, data):
         """Inserting the first element into the hash tree
 
         :param data: list of item sets to be inserted into the hash tree
@@ -157,7 +156,7 @@ class Tree(object):
             self.insertion(data, level)
 
     # Displaying the content of the complete tree from left to right (Child  0 to Child length )
-    def Tree_display(self, parent, length):
+    def treeDisplay(self, parent, length):
         """Displaying the content of the hash tree
 
         :param parent: Object reference of the parent node of the current node
@@ -169,7 +168,7 @@ class Tree(object):
         if self.leaf is False:
             for i in range(length):
                 parent = self
-                self.child[i].Tree_display(parent, length)
+                self.child[i].treeDisplay(parent, length)
 
         else:
             if not self.data:
@@ -178,7 +177,7 @@ class Tree(object):
                 print(self.data)
                 print(parent.level)
 
-    def Tree_search(self, element):
+    def treeSearch(self, element):
         """Searching a particular element in a hash tree and if it is identified we ll increment the count
             that element by 1 other returning the cursor to called function without any modification
 
@@ -190,7 +189,7 @@ class Tree(object):
         if self.leaf is False:
             indexing111 = element[self.level] % noOfChildren
             # print(indexing111) # for displaying the path of the element evaluation
-            self.child[indexing111].Tree_search(element)
+            self.child[indexing111].treeSearch(element)
         else:
             if not self.data:
                 return
@@ -221,11 +220,9 @@ class Apriori(frequentPatterns):
     iData = " "
     oFile = " "
     transaction = []
-    finalFps = defaultdict()
     Database = []
 
-
-    def Check(self, line):
+    def check(self, line):
         """Identifying the delimiter of the input file
 
             :param line: list of special characters may be used by a user to separate the items in a input file
@@ -235,57 +232,59 @@ class Apriori(frequentPatterns):
             """
         l = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
         j = None
+        # print(line)
         for i in l:
             if i in line:
+                # print(i)
                 return i
         return j
 
-    def creatingItemsets(self, iFileName):
-        """Creating a Database from input file and updating the same to global variable finalFps
+    def creatingItemSets(self, iFileName):
+        """Creating a Database from input file and updating the same to global variable finalPatterns
 
             :param iFileName: User given input file path with each row as a single transaction
             :type iFileName: str
             """
         # import pandas as pd
-        # global Database
-
+        global Database
+        Database = []
         lno = 0
         data = []
         if isinstance(iFileName, list):
-            self.Database = iFileName
+            Database = iFileName
         if isinstance(iFileName, pd.DataFrame):
             if iFileName.empty:
                 print("its empty..")
                 quit()
             i = iFileName.columns.values.tolist()
             if 'Transactions' in i:
-                self.Database = iFileName['Transactions'].tolist()
+                Database = iFileName['Transactions'].tolist()
             if 'Patterns' in i:
-                self.Database = iFileName['Patterns'].tolist()
+                Database = iFileName['Patterns'].tolist()
 
         if '.CSV' in iFileName:
             file1 = pd.read_csv(iFileName)
             columns = list(file1.head(0))
             if "Patterns" in columns:
-                with open(iFileName, newline='') as csvfile:
-                    data = csv.DictReader(csvfile)
+                with open(iFileName, newline='') as csvFile:
+                    data = csv.DictReader(csvFile)
                     for row in data:
                         l = row['Patterns']
                         l1 = l.replace("[", "")
                         l2 = l1.replace("]", "")
                         li = list(l2.split(","))
                         li1 = [int(i) for i in li]
-                        self.Database.append(li1)
+                        Database.append(li1)
             if "Transactions" in columns:
-                with open(iFileName, newline='') as csvfile:
-                    data = csv.DictReader(csvfile)
+                with open(iFileName, newline='') as csvFile:
+                    data = csv.DictReader(csvFile)
                     for row in data:
                         l = row['Transactions']
                         l1 = l.replace("[", "")
                         l2 = l1.replace("]", "")
                         li = list(l2.split(","))
                         li1 = [int(i) for i in li]
-                        self.Database.append(li1)
+                        Database.append(li1)
         else:
             try:
                 with open(iFileName, 'r', encoding='utf-8') as f:
@@ -293,24 +292,20 @@ class Apriori(frequentPatterns):
                         line.strip()
                         if lno == 0:
                             lno += 1
-                            delimiter = self.Check([line])
+                            delimiter = self.check(line)
                             # li=[lno]
                             li = line.split(delimiter)
-                            if delimiter == ',':
-                                li1 = [i.rstrip() for i in li]
-                                self.Database.append([i.rstrip() for i in li])
-                            else:
-                                self.Database.append(li)
-                            data.append([lno, li1])
+                            li1 = [i.rstrip() for i in li]
+                            Database.append([i.rstrip() for i in li1])
+                            # else:
+                            # self.Database.append(li)
+                            # data.append([lno,li1])
                         else:
                             lno += 1
                             li = line.split(delimiter)
-                            if delimiter == ',':
-                                li1 = [i.rstrip() for i in li]
-                                self.Database.append(li1)
-                            else:
-                                self.Database.append(li)
-                # print(Database)
+                            # if delimiter==',':
+                            li1 = [i.rstrip() for i in li]
+                            Database.append(li1)
             except IOError:
                 print("File Not Found")
                 quit()
@@ -319,182 +314,185 @@ class Apriori(frequentPatterns):
         # Database=iFileName['Transactions'].tolist()
 
     # function to get frequent one item set
-    def frequent_one_item(self):
-        """Generating One frequent items sets and updating the same to global variable finalFps
+    def frequentOneItem(self):
+        """Generating One frequent items sets and updating the same to global variable finalPatterns
 
         """
 
         candidate = {}
-        # global finalFps
-        for i in range(len(self.Database)):
-            for j in range(len(self.Database[i])):
-                if self.Database[i][j] not in candidate:
-                    candidate[self.Database[i][j]] = 1
+        global finalPatterns, minSup, Database
+        minSup = self.minSup
+        for i in range(len(Database)):
+            for j in range(len(Database[i])):
+                if Database[i][j] not in candidate:
+                    candidate[Database[i][j]] = 1
                 else:
-                    candidate[self.Database[i][j]] += 1
-        self.finalFps = {keys: value for keys, value in candidate.items() if value >= self.minSup}
+                    candidate[Database[i][j]] += 1
+        finalPatterns = {keys: value for keys, value in candidate.items() if value >= minSup}
 
     # def less_items():
     #    pass
 
-    def dictKeysToInt(self, a):
+    def dictKeysToInt(self, iList):
         """Converting dictionary keys to integer elements
 
-        :param a: Dictionary with item sets as keys with list of strings type and their support count as
+        :param iList: Dictionary with item sets as keys with list of strings type and their support count as
             value
-        :type a: dict
+        :type iList: dict
         :returns: a list of integer item sets to represent dictionary keys
         :rtype: list
         """
 
         temp = []
-        for ite in a.keys():
+        for ite in iList.keys():
             ite = [int(i) for i in ite.strip('[]').split(',')]
             temp.append(ite)
             # print(sorted(temp))
         return sorted(temp)
 
-    def subset_creation(self, transaction, length_subset):
-        """Generating combination of itemsets
+    def subsetCreation(self, transaction, lengthSubset):
+        """Generating combination of item sets
 
             :param transaction: Total list of transactions of the database, each with items
             :type transaction: list
-            :param length_subset: No of elements in the combination of items
-            :type length_subset: int
-            :returns: list of combinations of items each with of length equals to length_subset
+            :param lengthSubset: No of elements in the combination of items
+            :type lengthSubset: int
+            :returns: list of combinations of items each with of length equals to lengthSubset
             :rtype: list
             """
 
-        subset = list(c(transaction, length_subset))
+        subset = list(c(transaction, lengthSubset))
         temp = []
         for i in range(len(subset)):
-            final_list = sorted(list(subset[i]))
-            temp.append(final_list)
+            finalList = sorted(list(subset[i]))
+            temp.append(finalList)
         return sorted(temp)
 
-    def apriori_generate(self, listofitemsets, k):
+    def aprioriGenerate(self, listOfItemSets, nLength):
         """Apriori Generation function along with item pruning of redundant items
 
-            :param listofitemsets: list of k-1 length itemsets for generating k length length itemsets
-            :type listofitemsets: list
-            :param k: length of the next itemsets
-            :type k: int
-            :returns: list of final candidate itemsets of length k after pruning k-1 length itemsets
+            :param listOfItemSets: list of k-1 length item sets for generating k length length item sets
+            :type listOfItemSets: list
+            :param nLength: length of the next item sets
+            :type nLength: int
+            :returns: list of final candidate item sets of length k after pruning k-1 length item sets
             :rtype: list
             """
 
         ck = []
         # join step
-        lenlk = len(listofitemsets)
-        for i in range(lenlk):
-            for j in range(i + 1, lenlk):
-                list1 = list(listofitemsets[i])[:k - 2]
-                list2 = list(listofitemsets[j])[:k - 2]
+        lengthK = len(listOfItemSets)
+        for i in range(lengthK):
+            for j in range(i + 1, lengthK):
+                list1 = list(listOfItemSets[i])[:nLength - 2]
+                list2 = list(listOfItemSets[j])[:nLength - 2]
                 if list1 == list2:
-                    ck.append(sorted(list(set(listofitemsets[i]) | set(listofitemsets[j]))))
+                    ck.append(sorted(list(set(listOfItemSets[i]) | set(listOfItemSets[j]))))
         # print(ck)
         # prune step
-        final_ck = []
+        finalCandidateK = []
         for candidate in ck:
-            all_subsets = self.subset_creation(candidate, k - 1)
+            all_subsets = self.subsetCreation(candidate, nLength - 1)
             found = True
             for i in range(len(all_subsets)):
                 value = list(sorted(all_subsets[i]))
-                if value not in listofitemsets:
+                if value not in listOfItemSets:
                     found = False
                     break
             if found:
-                final_ck.append(candidate)
+                finalCandidateK.append(candidate)
 
-        # print(final_ck)
+        # print(finalCandidateK)
 
-        return sorted(final_ck)
+        return sorted(finalCandidateK)
 
     def startMine(self):
         """main program to start the operation
         """
 
-        global itemSets, endTime, startTime
+        global itemSets, endTime, startTime, minSup, iData
         global noOfChildren, maxRecordsInNonLeaf
         startTime = time.time()
+        minSup = self.minSup
+        iData = self.iData
 
-        if self.data is None:
+        if iData is None:
             raise Exception("Please enter the file path or file name:")
             # quit()
-        iFileName = self.data
-        if self.minSup is None:
+        iFileName = iData
+        if minSup is None:
             raise Exception("Please enter the Minimum Support")
         # Database = []
-        if self.minSup <= 0:
+        if minSup <= 0:
             raise Exception(
                 "Please enter the Minimum Support between (0,1) in percentage(%) calculated with database count")
             # quit()
 
-        self.creatingItemsets(iFileName)
+        self.creatingItemSets(iFileName)
 
-        if self.minSup > len(self.Database):
+        if minSup > len(Database):
             raise Exception("Please enter the minSup in range between 0 to 1")
             # quit()
 
-        self.minSup = (len(self.Database) * self.minSup)
+        minSup = (len(Database) * minSup)
 
         # print(minSup)
-        self.frequent_one_item()
+        self.frequentOneItem()
         # Sorting one frequent item sets
-        frequent_one = sorted([int(i) for i in self.finalFps.keys()])
+        frequentOne = sorted([int(i) for i in finalPatterns.keys()])
 
         iteration = True
-        list_for_next_iteration = []
+        listForNextIteration = []
         iter = 2
         while iteration:
             # print("hello")
             if iter == 2:
-                # Generation of candiate two item sets and adding the same to Hash tree
-                comb = self.subset_creation(frequent_one, 2)  # list(c(frequent_one, 2))
+                # Generation of candidate two item sets and adding the same to Hash tree
+                comb = self.subsetCreation(frequentOne, 2)  # list(c(frequentOne, 2))
                 # print(comb)
             else:
-                comb = self.apriori_generate(list_for_next_iteration, iter)
+                comb = self.aprioriGenerate(listForNextIteration, iter)
                 # print("comb")
             if len(comb) == 1:
                 count = 0
-                for i in range(len(self.Database)):
-                    rowOfDatabase = set(int(t) for t in self.Database[i])
+                for i in range(len(Database)):
+                    rowOfDatabase = set(int(t) for t in Database[i])
                     if set(comb[0]).issubset(rowOfDatabase):
                         count += 1
-                if count >= self.minSup:
-                    self.finalFps[str(comb)] = count
+                if count >= minSup:
+                    finalPatterns[str(comb)] = count
                 break
             if not comb:
                 break
             maintain = Tree()
-            # Inserting Candidate itemsets into hash tree
+            # Inserting Candidate item sets into hash tree
             for i in range(len(comb)):
                 test = comb[i]  # sorted([int(t) for t in comb[i]])
-                maintain.first_element(test)
-            for i in range(len(self.Database)):
-                rowOfDatabase = [int(t) for t in self.Database[i]]
-                subse = self.subset_creation(rowOfDatabase, iter)
-                for j in range(len(subse)):
-                    maintain.Tree_search(subse[j])
+                maintain.firstElement(test)
+            for i in range(len(Database)):
+                rowOfDatabase = [int(t) for t in Database[i]]
+                subSet = self.subsetCreation(rowOfDatabase, iter)
+                for j in range(len(subSet)):
+                    maintain.treeSearch(subSet[j])
 
-            items_after_support = {keys: value for keys, value in itemSets.items() if value >= self.minSup}
-            # print(iter, "frequent itemsets :", len(items_after_support))
-            if items_after_support is None:
+            itemsAfterSupport = {keys: value for keys, value in itemSets.items() if value >= self.minSup}
+            # print(iter, "frequent item sets :", len(itemsAfterSupport))
+            if itemsAfterSupport is None:
                 # iteration = False
                 break
-            self.finalFps.update(items_after_support)
-            # print("Total frequent item sets are:", len(finalFps))
-            if len(items_after_support) == 0 or len(items_after_support) == 1:
-                # print("Total frequent item sets are:", len(finalFps))
+            finalPatterns.update(itemsAfterSupport)
+            # print("Total frequent item sets are:", len(finalPatterns))
+            if len(itemsAfterSupport) == 0 or len(itemsAfterSupport) == 1:
+                # print("Total frequent item sets are:", len(finalPatterns))
                 break
-            list_for_next_iteration = self.dictKeysToInt(items_after_support)
-            items_after_support.clear()
+            listForNextIteration = self.dictKeysToInt(itemsAfterSupport)
+            itemsAfterSupport.clear()
             itemSets.clear()
 
             iter += 1
 
         endTime = time.time()
-        print("Frequent itemsets were generated successfully using AprioriHashtree algorithm")
+        print("Frequent item sets were generated successfully using Apriori Hash tree algorithm")
 
     def getMemory(self):
         """Calculating the amount of memory consumed by the Apriori algorithm
@@ -517,79 +515,41 @@ class Apriori(frequentPatterns):
         return endTime - startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent itemsets in a dataframe and converting it to .csv file
+        """Storing final frequent item sets in a dataframe and converting it to .csv file
         """
-        # import pandas as pd
-        # global finalFps
+
+        global finalPatterns
         df = {}
-        # for x,y in self.finalFps.items():
+        # for x,y in finalPatterns.items():
         data = []
-        for a, b in self.finalFps.items():
+        for a, b in finalPatterns.items():
             data.append([a, b])
             # print(x)
             # s = "output" + str(x)+".CSV"
             df = pd.DataFrame(data, columns=['Patterns', 'Support'])
-        # print("Total frequent itemsets are:", len(df))
+        # print("Total frequent item sets are:", len(df))
         return df
 
-    def storePatternsInFile(self, outputfile):
-        """ Function get the frequent patterns in to a outputfile
-        
-        :param outputfile: Storing all frequent patterns in a file
-        :type outputfile: file
+    def storePatternsInFile(self, outputFile):
+        """ Function get the frequent patterns in to a outputFile
+
+        :param outputFile: Storing all frequent patterns in a file
+        :type outputFile: file
         """
 
         # data = Path(sys.argv[1])
-        # global finalFps
-        writer = open(outputfile, 'w+')
-        for x, y in self.finalFps.items():
+        # global finalPatterns
+        writer = open(outputFile, 'w+')
+        for x, y in finalPatterns.items():
             # s = "output" + str(x)
             s1 = str(x) + ":" + str(y)
             writer.write("%s \n" % s1)
         # InFile()
 
     def getFrequentPatterns(self):
-        """Returing final frequent itemsets in a Dictionary
-
-        Returns
-        -------
-        defaultdict
+        """Returning final frequent item sets in a Dictionary
 
         """
-        return self.finalFps
+        global finalPatterns
 
-    # def getStatsInFile(self,statsfile):
-    #     """ Printing the statistics of the database into a Statistics file
-    #     :param global Database variable: Storing the data in to a Database variable
-    #     :type Database: defaultdict
-    #     """
-    #     #global Database
-    #     sum1 = 0
-    #     min1 = 999999
-    #     max1 = -1
-    #     tot = 0
-    #     si = []
-    #     l1 = 0
-    #     s = statsfile
-    #     writer1 = open(s, 'w+')
-    #     for line in self.Database:
-    #         l = line
-    #         for i in l:
-    #             if i not in si:
-    #                 si.append(i)
-    #         if (len(l) > max1):
-    #             max1 = len(l)
-    #         sum1 += len(l)
-    #         if (len(l) < min1):
-    #             min1 = len(l)
-    #         tot += len(l)
-    #     s = "Total number of transactions:" + str(len(self.Database))
-    #     writer1.write("%s \n" % s)
-    #     s = "Total number of items:" + str(len(si))
-    #     writer1.write("%s \n" % s)
-    #     s = "Minimum length of a transaction: " + str(min1)
-    #     writer1.write("%s \n" % s)
-    #     s = "Maximum length of a transaction: " + str(max1)
-    #     writer1.write("%s \n" % s)
-    #     s = "Avg length of a transaction: " + str(tot / len(self.Database))
-    #     writer1.write("%s \n" % s)
+        return finalPatterns

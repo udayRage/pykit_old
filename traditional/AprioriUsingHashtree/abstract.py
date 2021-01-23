@@ -46,23 +46,17 @@ class frequentPatterns(ABC):
             Total amount of runtime taken by the program will be retrieved from this function
     """
 
-    def __init__(self, iData, minSup, nodes=1000, nonLeaf=50):
+    def __init__(self, iData, minSup):
         """
         :param iData: input data
         :type iData: str or pandas.DataFrame
         :param minSup: user specified minimum support value. It needs to be specified within the interval (0,1).
         :type minSup: float
-        :param nodes: maximum number of children of the hash tree
-        :type nodes: int
-        :param nonLeaf: maximum number of elements in non leaf nodes of the hash tree
-        :type nonLeaf: int
         """
 
         self.iData = iData
         self.minSup = minSup
-        self.nodes = nodes
-        self.nonLeaf = nonLeaf
-        # self.finalPatterns = {}
+
 
     @abstractmethod
     def iData(self):
