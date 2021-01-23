@@ -1,11 +1,5 @@
-import time
-import csv
-import pandas as pd
-from collections import defaultdict
-from itertools import combinations as c
-import os
-import os.path
-import psutil
+from abstract import *
+
 
 startTime = float
 endTime = float
@@ -216,18 +210,20 @@ class Tree(object):
                             return
 
 
-class Apriori:
+class Apriori(frequentPatterns):
     """
 
     """
+    minSup = float()
+    startTime = float()
+    endTime = float()
+    finalPatterns = {}
+    iData = " "
+    oFile = " "
+    transaction = []
+    finalFps = defaultdict()
+    Database = []
 
-    def __init__(self, data, minSup, nodes=1000, nonLeaf=50):
-        self.data = data
-        self.minSup = minSup
-        self.nodes = nodes
-        self.nonLeaf = nonLeaf
-        self.finalFps = defaultdict()
-        self.Database = []
 
     def Check(self, line):
         """Identifying the delimiter of the input file
@@ -520,7 +516,7 @@ class Apriori:
         global endTime, startTime
         return endTime - startTime
 
-    def getPatternInDf(self):
+    def getPatternsInDataFrame(self):
         """Storing final frequent itemsets in a dataframe and converting it to .csv file
         """
         # import pandas as pd
@@ -536,7 +532,7 @@ class Apriori:
         # print("Total frequent itemsets are:", len(df))
         return df
 
-    def getPatternsInFile(self, outputfile):
+    def storePatternsInFile(self, outputfile):
         """ Function get the frequent patterns in to a outputfile
         
         :param outputfile: Storing all frequent patterns in a file
@@ -552,7 +548,7 @@ class Apriori:
             writer.write("%s \n" % s1)
         # InFile()
 
-    def getFPs(self):
+    def getFrequentPatterns(self):
         """Returing final frequent itemsets in a Dictionary
 
         Returns
