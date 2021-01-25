@@ -1,9 +1,13 @@
 from abc import ABC, abstractmethod
 import time
+import csv
 import pandas as pd
+from collections import defaultdict
+from itertools import combinations as c
 import os
 import os.path
 import psutil
+
 
 
 class frequentPatterns(ABC):
