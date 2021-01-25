@@ -97,11 +97,9 @@ class Apriori(frequentPatterns):
             self.transaction = [set([i.rstrip() for i in line.split(',')]) for line in f]
             f.close()
         self.minSup = int(math.ceil(self.minSup * len(self.transaction)) / 100)
-
-        itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
+        itemsList = sorted(list(set.union(*self.transaction)))
         items = [{i} for i in itemsList]
         itemsCount = len(items)
-
         for i in range(1, itemsCount):
             frequentSet = self.candidate2Frequent(items)
             if len(frequentSet) == 0:
@@ -117,22 +115,38 @@ class Apriori(frequentPatterns):
         self.memoryRSS = process.memory_info().rss
 
     def getMemoryUSS(self):
-        """Total amount of USS memory consumed by the program will be retrieved from this function"""
+        """Total amount of USS memory consumed by the program will be retrieved from this function
+
+        :return: returning total memory consumed in USS
+        :rtype: float
+        """
 
         return self.memoryUSS
 
     def getMemoryRSS(self):
-        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
+        """Total amount of RSS memory consumed by the program will be retrieved from this function
+
+        :return: returning total memory consumed in RSS
+        :rtype: float
+        """
 
         return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm"""
+        """Calculating the total amount of execution time taken by the Apriori algorithm
+
+        :return: returning total runTime
+        :rtype: float
+        """
 
         return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
+        """Storing final frequent item sets in a dataFrame, column names as Patterns and support respectively
+
+        :return: returning frequent item sets in a dataFrame
+        :rtype: pandas data frame
+        """
 
         dataFrame = {}
         data = []
@@ -147,11 +161,12 @@ class Apriori(frequentPatterns):
         :param outFile: .csv output file name
         :type outFile: file
         """
+
         self.oFile = outFile
         writer = open(self.oFile, 'w+')
         for x, y in self.finalPatterns.items():
-            s1 = str(x) + ":" + str(y)
-            writer.write("%s \n" % s1)
+            itemsAndSupport = str(x) + ":" + str(y)
+            writer.write("%s \n" % itemsAndSupport)
 
     def getFrequentPatterns(self):
         """ Function to send the set of frequent item sets after completion of the mining process
@@ -159,4 +174,5 @@ class Apriori(frequentPatterns):
         :return: returning frequent item sets
         :rtype: dict
         """
+
         return self.finalPatterns
