@@ -1,22 +1,22 @@
 from traditional.abstractClass.abstractFrequentPatterns import *
 
 
-def fpList2CList(fpList, length):
+def frequent2Candidate(frequentList, length):
     """Generates candidate item sets from the frequent item sets
 
-    :param fpList: set of all frequent item sets to generate candidate item sets of each of size is length
-    :type fpList: dict
+    :param frequentList: set of all frequent item sets to generate candidate item sets of each of size is length
+    :type frequentList: dict
     :param length: size of each candidate item sets to be generated
     :type length: int
     :return: set of candidate item sets in sorted order
     :rtype: list
     """
 
-    fp2CList = []
-    for i in fpList:
-        nextList = [i | j for j in fpList if len(i | j) == length and (i | j) not in fp2CList]
-        fp2CList.extend(nextList)
-    return sorted(fp2CList)
+    frequent2CandidateList = []
+    for i in frequentList:
+        nextList = [i | j for j in frequentList if len(i | j) == length and (i | j) not in frequent2CandidateList]
+        frequent2CandidateList.extend(nextList)
+    return sorted(frequent2CandidateList)
 
 
 class Apriori(frequentPatterns):
@@ -26,25 +26,25 @@ class Apriori(frequentPatterns):
 
         Attributes
         ----------
-        iData: str or pandas.DataFrame
+        iFile : str
             Input file name or path of the input file
-        minSup : float
+        minSup: float
             UserSpecified minimum support value
-        startTime :float
+        startTime:float
             To record the start time of the algorithm
         endTime:float
             To record the completion time of the algorithm
-        finalPatterns : dict
+        finalPatterns: dict
             Storing the complete set of patterns in a dictionary variable
         oFile : str
             Name of the output file to store complete set of frequent patterns
-        transaction : list
-            To store the complete set of transactions
+        memoryUSS : float
+            To store the total amount of USS memory consumed by the program
+        memoryRSS : float
+            To store the total amount of RSS memory consumed by the program
 
         Methods
         -------
-        cList2FpList(self, cList)
-            Candidate list to frequent item sets generation function
         startMine()
             Mining process will start from here
         getFrequentPatterns()
@@ -53,8 +53,10 @@ class Apriori(frequentPatterns):
             Complete set of frequent patterns will be loaded in to a output file
         getPatternsInDataFrame()
             Complete set of frequent patterns will be loaded in to data frame
-        getMemory()
-            Total amount of memory consumed by the program will be retrieved from this function
+        getMemoryUSS()
+            Total amount of USS memory consumed by the program will be retrieved from this function
+        getMemoryRSS()
+            Total amount of RSS memory consumed by the program will be retrieved from this function
         getRuntime()
             Total amount of runtime taken by the program will be retrieved from this function
     """
@@ -63,32 +65,35 @@ class Apriori(frequentPatterns):
     startTime = float()
     endTime = float()
     finalPatterns = {}
-    iData = str()
-    oFile = str()
+    iFile = " "
+    oFile = " "
     transaction = []
+    memoryUSS = float()
+    memoryRSS = float()
 
-    def cList2FpList(self, cList):
+    def candidate2Frequent(self, candidateList):
         """Generates frequent item sets from the candidate item sets
 
-        :param cList: Candidate item sets will be given as input
-        :type cList: list
+        :param candidateList: Candidate item sets will be given as input
+        :type candidateList: list
         :return: returning set of all frequent item sets
         :rtype: dict
         """
 
-        c2FList = {}
+        candidate2FrequentList = {}
         for i in self.transaction:
-            dictionary = {frozenset(j): int(c2FList.get(frozenset(j), 0)) + 1 for j in cList if j.issubset(i)}
-            c2FList.update(dictionary)
-        c2FList = {key: value for key, value in c2FList.items() if value >= self.minSup}
+            dictionary = {frozenset(j): int(candidate2FrequentList.get(frozenset(j), 0)) + 1 for j in candidateList if
+                          j.issubset(i)}
+            candidate2FrequentList.update(dictionary)
+        candidate2FrequentList = {key: value for key, value in candidate2FrequentList.items() if value >= self.minSup}
 
-        return c2FList
+        return candidate2FrequentList
 
     def startMine(self):
         """ frequent pattern mining process will start from here"""
 
         self.startTime = time.time()
-        with open(self.iData, 'r') as f:
+        with open(self.iFile, 'r') as f:
             self.transaction = [set(line.split(',')) for line in f]
             f.close()
 
@@ -97,25 +102,28 @@ class Apriori(frequentPatterns):
         itemsCount = len(items)
 
         for i in range(1, itemsCount):
-            fpSet = self.cList2FpList(items)
-            if len(fpSet) == 0:
+            frequentSet = self.candidate2Frequent(items)
+            if len(frequentSet) == 0:
                 print("No frequent sets")
-            self.finalPatterns.update(fpSet)
-            items = fpList2CList(fpSet, i + 1)
+            self.finalPatterns.update(frequentSet)
+            items = frequent2Candidate(frequentSet, i + 1)
             if len(items) == 0:
                 print("End of Frequent Item Sets")
                 break  # finish apriori
         self.endTime = time.time()
-
-    def getMemory(self):
-        """Calculating the amount of memory consumed by the Apriori algorithm"""
-
-        # import psutil
-        # global minSup
         process = psutil.Process(os.getpid())
-        memory = process.memory_full_info().uss  # process.memory_info().rss
-        memoryInMb = memory / (1024 * 1024)
-        return memoryInMb
+        self.memoryUSS = process.memory_full_info().uss
+        self.memoryRSS = process.memory_info().rss
+
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the program will be retrieved from this function"""
+
+        return self.memoryUSS
+
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
+
+        return self.memoryRSS
 
     def getRuntime(self):
         """Calculating the total amount of execution time taken by the Apriori algorithm"""
@@ -125,12 +133,12 @@ class Apriori(frequentPatterns):
     def getPatternsInDataFrame(self):
         """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
-        df = {}
+        dataFrame = {}
         data = []
         for a, b in self.finalPatterns.items():
             data.append([a, b])
-            df = pd.DataFrame(data, columns=['Patterns', 'Support'])
-        return df
+            dataFrame = pd.DataFrame(data, columns=['Patterns', 'Support'])
+        return dataFrame
 
     def storePatternsInFile(self, outFile):
         """Main apriori function receiving input file path, list of minimum support values, nodes, and nonLeaf
