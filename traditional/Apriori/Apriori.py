@@ -1,24 +1,6 @@
 from traditional.abstractClass.abstractFrequentPatterns import *
 
 
-def frequent2Candidate(frequentList, length):
-    """Generates candidate item sets from the frequent item sets
-
-    :param frequentList: set of all frequent item sets to generate candidate item sets of each of size is length
-    :type frequentList: dict
-    :param length: size of each candidate item sets to be generated
-    :type length: int
-    :return: set of candidate item sets in sorted order
-    :rtype: list
-    """
-
-    frequent2CandidateList = []
-    for i in frequentList:
-        nextList = [i | j for j in frequentList if len(i | j) == length and (i | j) not in frequent2CandidateList]
-        frequent2CandidateList.extend(nextList)
-    return sorted(frequent2CandidateList)
-
-
 class Apriori(frequentPatterns):
     """ Apriori main class
 
@@ -29,7 +11,7 @@ class Apriori(frequentPatterns):
         iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value
+            UserSpecified minimum support value and needs to be specified in the interval (0, 100)
         startTime:float
             To record the start time of the algorithm
         endTime:float
@@ -90,6 +72,24 @@ class Apriori(frequentPatterns):
 
         return candidate2FrequentList
 
+    @staticmethod
+    def frequent2Candidate(frequentList, length):
+        """Generates candidate item sets from the frequent item sets
+
+        :param frequentList: set of all frequent item sets to generate candidate item sets of each of size is length
+        :type frequentList: dict
+        :param length: size of each candidate item sets to be generated
+        :type length: int
+        :return: set of candidate item sets in sorted order
+        :rtype: list
+        """
+
+        frequent2CandidateList = []
+        for i in frequentList:
+            nextList = [i | j for j in frequentList if len(i | j) == length and (i | j) not in frequent2CandidateList]
+            frequent2CandidateList.extend(nextList)
+        return sorted(frequent2CandidateList)
+
     def startMine(self):
         """ frequent pattern mining process will start from here"""
 
@@ -97,6 +97,7 @@ class Apriori(frequentPatterns):
         with open(self.iFile, 'r') as f:
             self.transaction = [set([i.rstrip() for i in line.split(',')]) for line in f]
             f.close()
+        self.minSup = int(math.ceil(self.minSup * len(self.transaction)) / 100)
 
         itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
         items = [{i} for i in itemsList]
@@ -108,7 +109,7 @@ class Apriori(frequentPatterns):
             if len(frequentSet) == 0:
                 print("No frequent sets")
             self.finalPatterns.update(frequentSet)
-            items = frequent2Candidate(frequentSet, i + 1)
+            items = self.frequent2Candidate(frequentSet, i + 1)
             if len(items) == 0:
                 print("End of Frequent Item Sets")
                 break  # finish apriori

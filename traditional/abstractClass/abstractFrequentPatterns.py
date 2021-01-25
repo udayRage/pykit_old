@@ -7,7 +7,7 @@ from itertools import combinations as c
 import os
 import os.path
 import psutil
-
+import math
 
 
 class frequentPatterns(ABC):
@@ -21,7 +21,7 @@ class frequentPatterns(ABC):
         iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value
+            UserSpecified minimum support value and needs to be specified in the interval (0, 100)
         startTime:float
             To record the start time of the algorithm
         endTime:float
@@ -57,7 +57,8 @@ class frequentPatterns(ABC):
         """
         :param iFile: input data
         :type iFile: str or pandas.DataFrame
-        :param minSup: user specified minimum support value. It needs to be specified within the interval (0,1).
+        :param minSup: user specified minimum support value. It has to be given in terms of percentage within the
+        interval (0, 100).
         :type minSup: float
         """
 
