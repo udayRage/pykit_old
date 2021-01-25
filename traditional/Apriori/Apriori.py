@@ -1,9 +1,30 @@
 from abstract import *
 
+
+def fpList2CList(fpList, length):
+    """Generates candidate item sets from the frequent item sets
+
+    :param fpList: set of all frequent item sets to generate candidate item sets of each of size is length
+    :type fpList: dict
+    :param length: size of each candidate item sets to be generated
+    :type length: int
+    :return: set of candidate item sets in sorted order
+    :rtype: list
+    """
+
+    fp2CList = []
+    # list = []
+    # fp2CList = [set(c) for c in combinations(a,length) if c not in fp2CList]
+    for i in fpList:
+        nextList = [i | j for j in fpList if len(i | j) == length and (i | j) not in fp2CList]
+        fp2CList.extend(nextList)
+    return sorted(fp2CList)
+
+
 class Apriori(frequentPatterns):
     """ Apriori main class"""
-
     minSup = float()
+    print("Minimum support value:", minSup)
     startTime = float()
     endTime = float()
     finalPatterns = {}
@@ -20,48 +41,30 @@ class Apriori(frequentPatterns):
         :rtype: dict
         """
 
-        global minSup, transaction
-        minSup = float(self.minSup)
+        # global minSup, transaction
+        # minSup = float(self.minSup)
         c2FList = {}
-        for i in transaction:
+        for i in self.transaction:
             dictionary = {frozenset(j): int(c2FList.get(frozenset(j), 0)) + 1 for j in cList if j.issubset(i)}
             c2FList.update(dictionary)
-        c2FList = {key: value for key, value in c2FList.items() if value >= minSup}
+        c2FList = {key: value for key, value in c2FList.items() if value >= self.minSup}
+        print("Minimum support value inside the class", self.minSup)
         return c2FList
-
-    def fpList2CList(self, fpList, length):
-        """Generates candidate item sets from the frequent item sets
-
-        :param fpList: set of all frequent item sets to generate candidate item sets of each of size is length
-        :type fpList: dict
-        :param length: size of each candidate item sets to be generated
-        :type length: int
-        :return: set of candidate item sets in sorted order
-        :rtype: list
-        """
-
-        fp2CList = []
-        # list = []
-        # fp2CList = [set(c) for c in combinations(a,length) if c not in fp2CList]
-        for i in fpList:
-            nextList = [i | j for j in fpList if len(i | j) == length and (i | j) not in fp2CList]
-            fp2CList.extend(nextList)
-        return sorted(fp2CList)
 
     def startMine(self):
         """ frequent pattern mining process will start from here"""
 
-        global startTime, endTime, iData, transaction
+        # global startTime, endTime, iData, transaction, finalPatterns
 
         # count = 0
         # numberOfFrequent = []
-        startTime = time.time()
-        iData = self.iData
-        with open(iData, 'r') as f:
-            transaction = [set(line.split(',')) for line in f]
+        self.startTime = time.time()
+        # iData = self.iData
+        with open(self.iData, 'r') as f:
+            self.transaction = [set(line.split(',')) for line in f]
             f.close()
 
-        itemsList = sorted(list(set.union(*transaction)))  # because transaction is list
+        itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
         items = [{i} for i in itemsList]
         itemsCount = len(items)
 
@@ -70,14 +73,14 @@ class Apriori(frequentPatterns):
             if len(fpSet) == 0:
                 print("No frequent sets")
 
-            for li in fpSet:
-                print(sorted(li), "Support Count = ", fpSet[li])
+            # for li in fpSet:
+            #    print(sorted(li), "Support Count = ", fpSet[li])
             self.finalPatterns.update(fpSet)
-            items = self.fpList2CList(fpSet, i + 1)
+            items = fpList2CList(fpSet, i + 1)
             if len(items) == 0:
                 print("End of Frequent Item Sets")
                 break  # finish apriori'''
-        endTime = time.time()
+        self.endTime = time.time()
 
     def getMemory(self):
         """Calculating the amount of memory consumed by the Apriori algorithm"""
@@ -92,17 +95,17 @@ class Apriori(frequentPatterns):
     def getRuntime(self):
         """Calculating the total amount of execution time taken by the Apriori algorithm"""
 
-        global endTime, startTime
-        return endTime - startTime
+        # global endTime, startTime
+        return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
         """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
         # finalPatterns = self.finalPatterns
-        global finalPatterns
+        # global finalPatterns
         df = {}
         data = []
-        for a, b in finalPatterns.items():
+        for a, b in self.finalPatterns.items():
             data.append([a, b])
             df = pd.DataFrame(data, columns=['Patterns', 'Support'])
         return df
@@ -113,10 +116,10 @@ class Apriori(frequentPatterns):
         :param outFile: .csv output file name
         :type outFile: file
         """
-        global oFile, finalPatterns
-        oFile = outFile
-        writer = open(oFile, 'w+')
-        for x, y in finalPatterns.items():
+        # global oFile, finalPatterns
+        self.oFile = outFile
+        writer = open(self.oFile, 'w+')
+        for x, y in self.finalPatterns.items():
             # s = "output" + str(x)
             s1 = str(x) + ":" + str(y)
             writer.write("%s \n" % s1)
@@ -128,6 +131,6 @@ class Apriori(frequentPatterns):
         :return: returning frequent item sets
         :rtype: dict
         """
-        global finalPatterns
+        # global finalPatterns
 
         return self.finalPatterns
