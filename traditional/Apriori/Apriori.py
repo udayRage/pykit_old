@@ -52,7 +52,6 @@ class Apriori(frequentPatterns):
     memoryUSS = float()
     memoryRSS = float()
     transaction = []
-    count = 0
 
     def candidate2Frequent(self, candidateList):
         """Generates frequent item sets from the candidate item sets
@@ -105,7 +104,6 @@ class Apriori(frequentPatterns):
 
         for i in range(1, itemsCount):
             frequentSet = self.candidate2Frequent(items)
-            self.count = self.count + len(frequentSet)
             if len(frequentSet) == 0:
                 print("No frequent sets")
             self.finalPatterns.update(frequentSet)
@@ -161,5 +159,4 @@ class Apriori(frequentPatterns):
         :return: returning frequent item sets
         :rtype: dict
         """
-        print("Total item sets:", self.count)
         return self.finalPatterns
