@@ -1,4 +1,4 @@
-from abstract import *
+from traditional.abstractClass.abstractFrequentPatterns import *
 
 
 def fpList2CList(fpList, length):
@@ -63,8 +63,8 @@ class Apriori(frequentPatterns):
     startTime = float()
     endTime = float()
     finalPatterns = {}
-    iData = " "
-    oFile = " "
+    iData = str()
+    oFile = str()
     transaction = []
 
     def cList2FpList(self, cList):
