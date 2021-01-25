@@ -80,6 +80,18 @@ class frequentPatterns(ABC):
         pass
 
     @abstractmethod
+    def memoryUSS(self):
+        """Variable to store the end time of the complete program"""
+
+        pass
+
+    @abstractmethod
+    def memoryRSS(self):
+        """Variable to store the end time of the complete program"""
+
+        pass
+
+    @abstractmethod
     def finalPatterns(self):
         """Variable to store the complete set of patterns in a dictionary"""
 
@@ -120,11 +132,15 @@ class frequentPatterns(ABC):
         pass
 
     @abstractmethod
-    def getMemory(self):
-        """Total amount of memory consumed by the program will be retrieved from this function"""
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the program will be retrieved from this function"""
 
         pass
 
+    @abstractmethod
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the program will be retrieved from this funciton """
+        pass
     @abstractmethod
     def getRuntime(self):
         """Total amount of runtime taken by the program will be retrieved from this function"""
