@@ -30,13 +30,13 @@ class Tree(object):
         -------
         createChildren()
             creating children to hash tree
-        setChildrenValue(data_list)
-            Attach the list of data values into the children of the tree
+        setChildrenValue(dataList)
+            Storing the list of data inside the children of the hash tree
         splitting(level)
-            No of elements in a particular tree is crosses the user specified limit splitting
-            is performed based on level attribute
+            Splitting of the nonLeaf node, if the number of elements in that node is greater than the
+            maxRecordsInNonLeaf
         insertion(data, level)
-            Inserting data into a particular node in a particular level of the hash tree
+            Insertion of data in to the hash tree
         firstElement(data)
             Inserting the first element into the hash tree
         treeDisplay(parent, length)
