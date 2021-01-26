@@ -25,6 +25,8 @@ class Apriori(frequentPatterns):
             To store the total amount of USS memory consumed by the program
         memoryRSS : float
             To store the total amount of RSS memory consumed by the program
+        transaction : list
+            To store the complete set of transactions available in the input database/file
 
         Methods
         -------
@@ -42,6 +44,11 @@ class Apriori(frequentPatterns):
             Total amount of RSS memory consumed by the mining process will be retrieved from this function
         getRuntime()
             Total amount of runtime taken by the mining process will be retrieved from this function
+        candidate2Frequent(candidateList)
+            Generates frequent patterns from the candidate patterns
+        frequent2Candidate(frequentList, length)
+            Generates candidate patterns from the frequent patterns
+
     """
 
     minSup = float()
@@ -167,8 +174,8 @@ class Apriori(frequentPatterns):
         self.oFile = outFile
         writer = open(self.oFile, 'w+')
         for x, y in self.finalPatterns.items():
-            s1 = str(x) + ":" + str(y)
-            writer.write("%s \n" % s1)
+            patternsAndSupport = str(x) + ":" + str(y)
+            writer.write("%s \n" % patternsAndSupport)
 
     def getFrequentPatterns(self):
         """ Function to send the set of frequent patterns after completion of the mining process
