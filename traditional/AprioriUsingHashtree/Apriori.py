@@ -220,7 +220,8 @@ class Apriori(frequentPatterns):
     memoryRSS = float()
     Database = []
 
-    def check(self, line):
+    @staticmethod
+    def check(line):
         """Identifying the delimiter of the input file
 
             :param line: list of special characters may be used by a user to separate the items in a input file
@@ -243,21 +244,21 @@ class Apriori(frequentPatterns):
             :type iFileName: str
             """
         # import pandas as pd
-        global Database
-        Database = []
+        # global Database
+        self.Database = []
         lno = 0
-        data = []
+        # data = []
         if isinstance(iFileName, list):
-            Database = iFileName
+            self.Database = iFileName
         if isinstance(iFileName, pd.DataFrame):
             if iFileName.empty:
                 print("its empty..")
                 quit()
             i = iFileName.columns.values.tolist()
             if 'Transactions' in i:
-                Database = iFileName['Transactions'].tolist()
+                self.Database = iFileName['Transactions'].tolist()
             if 'Patterns' in i:
-                Database = iFileName['Patterns'].tolist()
+                self.Database = iFileName['Patterns'].tolist()
 
         if '.CSV' in iFileName:
             file1 = pd.read_csv(iFileName)
@@ -266,34 +267,34 @@ class Apriori(frequentPatterns):
                 with open(iFileName, newline='') as csvFile:
                     data = csv.DictReader(csvFile)
                     for row in data:
-                        l = row['Patterns']
-                        l1 = l.replace("[", "")
+                        listValue = row['Patterns']
+                        l1 = listValue.replace("[", "")
                         l2 = l1.replace("]", "")
                         li = list(l2.split(","))
                         li1 = [int(i) for i in li]
-                        Database.append(li1)
+                        self.Database.append(li1)
             if "Transactions" in columns:
                 with open(iFileName, newline='') as csvFile:
                     data = csv.DictReader(csvFile)
                     for row in data:
-                        l = row['Transactions']
-                        l1 = l.replace("[", "")
+                        listValue = row['Transactions']
+                        l1 = listValue.replace("[", "")
                         l2 = l1.replace("]", "")
                         li = list(l2.split(","))
                         li1 = [int(i) for i in li]
-                        Database.append(li1)
+                        self.Database.append(li1)
         else:
             try:
                 with open(iFileName, 'r', encoding='utf-8') as f:
                     for line in f:
-                        #line.strip()
+                        # line.strip()
                         if lno == 0:
                             lno += 1
                             delimiter = self.check([*line])
                             # li=[lno]
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
-                            Database.append([i.rstrip() for i in li1])
+                            self.Database.append([i.rstrip() for i in li1])
                             # else:
                             # self.Database.append(li)
                             # data.append([lno,li1])
@@ -302,13 +303,13 @@ class Apriori(frequentPatterns):
                             li = line.split(delimiter)
                             # if delimiter==',':
                             li1 = [i.rstrip() for i in li]
-                            Database.append(li1)
+                            self.Database.append(li1)
             except IOError:
                 print("File Not Found")
                 quit()
 
         # else:
-        # Database=iFileName['Transactions'].tolist()
+        # self.Database=iFileName['Transactions'].tolist()
 
     # function to get frequent one item set
     def frequentOneItem(self):
@@ -317,20 +318,21 @@ class Apriori(frequentPatterns):
         """
 
         candidate = {}
-        global finalPatterns, minSup, Database
-        minSup = self.minSup
-        for i in range(len(Database)):
-            for j in range(len(Database[i])):
-                if Database[i][j] not in candidate:
-                    candidate[Database[i][j]] = 1
+        # global finalPatterns, minSup, Database
+        # self.minSup = self.minSup
+        for i in range(len(self.Database)):
+            for j in range(len(self.Database[i])):
+                if self.Database[i][j] not in candidate:
+                    candidate[self.Database[i][j]] = 1
                 else:
-                    candidate[Database[i][j]] += 1
-        finalPatterns = {keys: value for keys, value in candidate.items() if value >= minSup}
+                    candidate[self.Database[i][j]] += 1
+        self.finalPatterns = {keys: value for keys, value in candidate.items() if value >= self.minSup}
 
     # def less_items():
     #    pass
 
-    def dictKeysToInt(self, iList):
+    @staticmethod
+    def dictKeysToInt(iList):
         """Converting dictionary keys to integer elements
 
         :param iList: Dictionary with item sets as keys with list of strings type and their support count as a value
@@ -346,7 +348,8 @@ class Apriori(frequentPatterns):
             # print(sorted(temp))
         return sorted(temp)
 
-    def subsetCreation(self, transaction, lengthSubset):
+    @staticmethod
+    def subsetCreation(transaction, lengthSubset):
         """Generating combination of item sets
 
             :param transaction: Total list of transactions of the database, each with items
@@ -405,57 +408,57 @@ class Apriori(frequentPatterns):
     def startMine(self):
         """main program to start the operation"""
 
-        global itemSets, endTime, startTime, minSup, iFile
-        global noOfChildren, maxRecordsInNonLeaf
-        startTime = time.time()
-        minSup = self.minSup
-        iFile = self.iFile
+        # global  endTime, startTime, minSup, iFile
+        global noOfChildren, maxRecordsInNonLeaf, itemSets
+        self.startTime = time.time()
+        # minSup = self.minSup
+        # iFile = self.iFile
 
-        if iFile is None:
+        if self.iFile is None:
             raise Exception("Please enter the file path or file name:")
             # quit()
-        iFileName = iFile
-        if minSup is None:
+        iFileName = self.iFile
+        if self.minSup is None:
             raise Exception("Please enter the Minimum Support")
-        # Database = []
-        if minSup <= 0:
+        # self.Database = []
+        if self.minSup <= 0:
             raise Exception(
                 "Please enter the Minimum Support between (0,1) in percentage(%) calculated with database count")
             # quit()
 
         self.creatingItemSets(iFileName)
 
-        if minSup > len(Database):
+        if self.minSup > len(self.Database):
             raise Exception("Please enter the minSup in range between 0 to 1")
             # quit()
 
-        minSup = (len(Database) * minSup)
+        # self.minSup = (len(self.Database) * self.minSup)
 
-        # print(minSup)
+        # print(self.minSup)
         self.frequentOneItem()
         # Sorting one frequent item sets
-        frequentOne = sorted([int(i) for i in finalPatterns.keys()])
+        frequentOne = sorted([int(i) for i in self.finalPatterns.keys()])
 
         iteration = True
         listForNextIteration = []
-        iter = 2
+        temp = 2
         while iteration:
             # print("hello")
-            if iter == 2:
+            if temp == 2:
                 # Generation of candidate two item sets and adding the same to Hash tree
                 comb = self.subsetCreation(frequentOne, 2)  # list(c(frequentOne, 2))
                 # print(comb)
             else:
-                comb = self.aprioriGenerate(listForNextIteration, iter)
+                comb = self.aprioriGenerate(listForNextIteration, temp)
                 # print("comb")
             if len(comb) == 1:
                 count = 0
-                for i in range(len(Database)):
-                    rowOfDatabase = set(int(t) for t in Database[i])
+                for i in range(len(self.Database)):
+                    rowOfDatabase = set(int(t) for t in self.Database[i])
                     if set(comb[0]).issubset(rowOfDatabase):
                         count += 1
-                if count >= minSup:
-                    finalPatterns[str(comb)] = count
+                if count >= self.minSup:
+                    self.finalPatterns[str(comb)] = count
                 break
             if not comb:
                 break
@@ -464,9 +467,9 @@ class Apriori(frequentPatterns):
             for i in range(len(comb)):
                 test = comb[i]  # sorted([int(t) for t in comb[i]])
                 maintain.firstElement(test)
-            for i in range(len(Database)):
-                rowOfDatabase = [int(t) for t in Database[i]]
-                subSet = self.subsetCreation(rowOfDatabase, iter)
+            for i in range(len(self.Database)):
+                rowOfDatabase = [int(t) for t in self.Database[i]]
+                subSet = self.subsetCreation(rowOfDatabase, temp)
                 for j in range(len(subSet)):
                     maintain.treeSearch(subSet[j])
 
@@ -475,18 +478,18 @@ class Apriori(frequentPatterns):
             if itemsAfterSupport is None:
                 # iteration = False
                 break
-            finalPatterns.update(itemsAfterSupport)
-            # print("Total frequent item sets are:", len(finalPatterns))
+            self.finalPatterns.update(itemsAfterSupport)
+            # print("Total frequent item sets are:", len(self.finalPatterns))
             if len(itemsAfterSupport) == 0 or len(itemsAfterSupport) == 1:
-                # print("Total frequent item sets are:", len(finalPatterns))
+                # print("Total frequent item sets are:", len(self.finalPatterns))
                 break
             listForNextIteration = self.dictKeysToInt(itemsAfterSupport)
             itemsAfterSupport.clear()
             itemSets.clear()
 
-            iter += 1
+            temp += 1
 
-        endTime = time.time()
+        self.endTime = time.time()
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
         self.memoryRSS = process.memory_info().rss
@@ -504,17 +507,17 @@ class Apriori(frequentPatterns):
 
     def getRuntime(self):
         """Calculating the total amount of execution time taken by the Apriori algorithm"""
-        global endTime, startTime
-        return endTime - startTime
+        # global endTime, startTime
+        return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
         """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
-        global finalPatterns
+        # global finalPatterns
         df = {}
-        # for x,y in finalPatterns.items():
+        # for x,y in self.finalPatterns.items():
         data = []
-        for a, b in finalPatterns.items():
+        for a, b in self.finalPatterns.items():
             data.append([a, b])
             # print(x)
             # s = "output" + str(x)+".CSV"
@@ -532,7 +535,7 @@ class Apriori(frequentPatterns):
         # data = Path(sys.argv[1])
         # global finalPatterns
         writer = open(outputFile, 'w+')
-        for x, y in finalPatterns.items():
+        for x, y in self.finalPatterns.items():
             # s = "output" + str(x)
             s1 = str(x) + ":" + str(y)
             writer.write("%s \n" % s1)
@@ -542,6 +545,6 @@ class Apriori(frequentPatterns):
         """Returning final frequent item sets in a Dictionary
 
         """
-        global finalPatterns
+        # global finalPatterns
 
-        return finalPatterns
+        return self.finalPatterns
