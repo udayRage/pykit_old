@@ -350,13 +350,13 @@ class Apriori(frequentPatterns):
 
     @staticmethod
     def subsetCreation(transaction, lengthSubset):
-        """Generating combination of patterns
+        """Generating subsets from the transactions of the database
 
-            :param transaction: Total list of transactions of the database, each with items
+            :param transaction: Total list of transactions of the database
             :type transaction: list
-            :param lengthSubset: No of elements in the combination of items
+            :param lengthSubset: no of elements to be presented in the subset
             :type lengthSubset: int
-            :returns: list of combinations of items each with of length equals to lengthSubset
+            :returns: list of subsets generated from the transactions of the complete database
             :rtype: list
             """
 
