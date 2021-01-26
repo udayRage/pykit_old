@@ -17,18 +17,23 @@ class frequentPatterns(ABC):
 
         Attributes
         ----------
-        iData : str or pandas.DataFrame
+        iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value
+            UserSpecified minimum support value. It has to be given in terms of count of total number of transactions
+            in the input database/file
         startTime:float
-            to record the start time of the algorithm
+            To record the start time of the algorithm
         endTime:float
-            to record the completed time of the algorithm
+            To record the completion time of the algorithm
         finalPatterns: dict
             Storing the complete set of patterns in a dictionary variable
         oFile : str
             Name of the output file to store complete set of frequent patterns
+        memoryUSS : float
+            To store the total amount of USS memory consumed by the program
+        memoryRSS : float
+            To store the total amount of RSS memory consumed by the program
 
         Methods
         -------
@@ -40,27 +45,29 @@ class frequentPatterns(ABC):
             Complete set of frequent patterns will be loaded in to a output file
         getPatternsInDataFrame()
             Complete set of frequent patterns will be loaded in to data frame
-        getMemory()
-            Total amount of memory consumed by the program will be retrieved from this function
+        getMemoryUSS()
+            Total amount of USS memory consumed by the program will be retrieved from this function
+        getMemoryRSS()
+            Total amount of RSS memory consumed by the program will be retrieved from this function
         getRuntime()
             Total amount of runtime taken by the program will be retrieved from this function
     """
 
-    def __init__(self, iData, minSup):
+    def __init__(self, iFile, minSup):
         """
-        :param iData: input data
-        :type iData: str or pandas.DataFrame
-        :param minSup: user specified minimum support value. It needs to be specified within the interval (0,1).
+        :param iFile: Input file name or path of the input file
+        :type iFile: str
+        :param minSup: UserSpecified minimum support value. It has to be given in terms of count of total number of
+        transactions in the input database/file
         :type minSup: float
         """
 
-        self.iData = iData
+        self.iFile = iFile
         self.minSup = minSup
 
-
     @abstractmethod
-    def iData(self):
-        """Variable to store the input file path/file name/data frame"""
+    def iFile(self):
+        """Variable to store the input file path/file name"""
 
         pass
 
@@ -78,6 +85,18 @@ class frequentPatterns(ABC):
 
     @abstractmethod
     def endTime(self):
+        """Variable to store the end time of the complete program"""
+
+        pass
+
+    @abstractmethod
+    def memoryUSS(self):
+        """Variable to store the end time of the complete program"""
+
+        pass
+
+    @abstractmethod
+    def memoryRSS(self):
         """Variable to store the end time of the complete program"""
 
         pass
@@ -123,9 +142,14 @@ class frequentPatterns(ABC):
         pass
 
     @abstractmethod
-    def getMemory(self):
-        """Total amount of memory consumed by the program will be retrieved from this function"""
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the program will be retrieved from this function"""
 
+        pass
+
+    @abstractmethod
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
         pass
 
     @abstractmethod

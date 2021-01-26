@@ -1,10 +1,8 @@
-from abstract import *
+from traditional.abstractClass.abstractFrequentPatterns import *
 
-# startTime = float
-# endTime = float
 itemSets = defaultdict()
 
-# Input for Hash mod function f(x) mod No_of_children
+# Input for Hash mod function f(x) mod noOfChildren
 noOfChildren = 1000  # int(input('No of children:'))
 
 # Input for splitting any Non Leaf node in after reaching maximum no of records in that tree
@@ -30,7 +28,7 @@ class Tree(object):
 
         Methods
         -------
-        createChildren(noOfChildren)
+        createChildren()
             creating children to hash tree
         setChildrenValue(data_list)
             Attach the list of data values into the children of the tree
@@ -39,11 +37,11 @@ class Tree(object):
             is performed based on level attribute
         insertion(data, level)
             Inserting data into a particular node in a particular level of the hash tree
-        firstElement(self, data)
+        firstElement(data)
             Inserting the first element into the hash tree
         treeDisplay(parent, length)
             Displaying the content of the tree based on the total number of elements and parent node
-        treeSearch(self, element)
+        treeSearch(element)
             Searching a particular element in a hash tree
     """
 
@@ -55,13 +53,10 @@ class Tree(object):
 
     # Creating the children of a particular node
 
-    def createChildren(self, noOfChildren):
-        """Creating children to the hash tree total of noOfChildren
+    def createChildren(self):
+        """Creating children to the hash tree total of noOfChildren"""
 
-        :param noOfChildren: it represents the total number of children to the hash tree at each level
-        :type noOfChildren: int
-        """
-
+        global noOfChildren
         self.leaf = False
         for i in range(0, noOfChildren):
             self.child.append(Tree())
@@ -97,9 +92,10 @@ class Tree(object):
 
         """
 
+        global noOfChildren
         self.level = level
 
-        self.createChildren(noOfChildren)
+        self.createChildren()
         for i in range(len(self.data)):
             indexing = self.data[i][level] % noOfChildren
             self.child[indexing].setChildrenValue(self.data[i])
@@ -118,6 +114,7 @@ class Tree(object):
         :type level: int
         """
 
+        global noOfChildren, maxRecordsInNonLeaf
         self.level = level
         # print(self.level)
         data_length = len(data)
@@ -149,7 +146,7 @@ class Tree(object):
         if not self.child:
             First = int(data[level]) % noOfChildren
 
-            self.createChildren(noOfChildren)
+            self.createChildren()
 
             self.child[First].data.append(data)  # setChildrenValue(data)
         else:
@@ -217,9 +214,10 @@ class Apriori(frequentPatterns):
     startTime = float()
     endTime = float()
     finalPatterns = {}
-    iData = " "
+    iFile = " "
     oFile = " "
-    transaction = []
+    memoryUSS = float()
+    memoryRSS = float()
     Database = []
 
     def check(self, line):
@@ -230,10 +228,10 @@ class Apriori(frequentPatterns):
             :returns: Delimited string used in the input file to separate each item
             :rtype: string
             """
-        l = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
+        listOfDelimiters = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
         j = None
         # print(line)
-        for i in l:
+        for i in listOfDelimiters:
             if i in line:
                 return i
         return j
@@ -335,8 +333,7 @@ class Apriori(frequentPatterns):
     def dictKeysToInt(self, iList):
         """Converting dictionary keys to integer elements
 
-        :param iList: Dictionary with item sets as keys with list of strings type and their support count as
-            value
+        :param iList: Dictionary with item sets as keys with list of strings type and their support count as a value
         :type iList: dict
         :returns: a list of integer item sets to represent dictionary keys
         :rtype: list
@@ -406,19 +403,18 @@ class Apriori(frequentPatterns):
         return sorted(finalCandidateK)
 
     def startMine(self):
-        """main program to start the operation
-        """
+        """main program to start the operation"""
 
-        global itemSets, endTime, startTime, minSup, iData
+        global itemSets, endTime, startTime, minSup, iFile
         global noOfChildren, maxRecordsInNonLeaf
         startTime = time.time()
         minSup = self.minSup
-        iData = self.iData
+        iFile = self.iFile
 
-        if iData is None:
+        if iFile is None:
             raise Exception("Please enter the file path or file name:")
             # quit()
-        iFileName = iData
+        iFileName = iFile
         if minSup is None:
             raise Exception("Please enter the Minimum Support")
         # Database = []
@@ -491,31 +487,28 @@ class Apriori(frequentPatterns):
             iter += 1
 
         endTime = time.time()
+        process = psutil.Process(os.getpid())
+        self.memoryUSS = process.memory_full_info().uss
+        self.memoryRSS = process.memory_info().rss
         print("Frequent item sets were generated successfully using Apriori Hash tree algorithm")
 
-    def getMemory(self):
-        """Calculating the amount of memory consumed by the Apriori algorithm
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the program will be retrieved from this function"""
 
-        """
-        # import psutil
-        # global minSup
-        process = psutil.Process(os.getpid())
-        memory = process.memory_full_info().uss  # process.memory_info().rss
-        memoryInMb = memory / (1024 * 1024)
-        return memoryInMb
-        # print(memoryInMb)  # in bytes
-        # print("Total Memory is:", memoryInMb)
+        return self.memoryUSS
+
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
+
+        return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm
-
-        """
+        """Calculating the total amount of execution time taken by the Apriori algorithm"""
         global endTime, startTime
         return endTime - startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file
-        """
+        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
         global finalPatterns
         df = {}
@@ -552,4 +545,3 @@ class Apriori(frequentPatterns):
         global finalPatterns
 
         return finalPatterns
-
