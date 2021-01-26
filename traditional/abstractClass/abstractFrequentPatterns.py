@@ -21,7 +21,7 @@ class frequentPatterns(ABC):
         iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value and needs to be specified in the interval (0, 100)
+            UserSpecified minimum support value. It has to be given in terms of percentage within the interval (0, 100)
         startTime:float
             To record the start time of the algorithm
         endTime:float
@@ -55,10 +55,10 @@ class frequentPatterns(ABC):
 
     def __init__(self, iFile, minSup):
         """
-        :param iFile: input data
-        :type iFile: str or pandas.DataFrame
-        :param minSup: user specified minimum support value. It has to be given in terms of percentage within the
-        interval (0, 100).
+        :param iFile: Input file name or path of the input file
+        :type iFile: str
+        :param minSup: UserSpecified minimum support value. It has to be given in terms of percentage within the
+        interval (0, 100)
         :type minSup: float
         """
 
