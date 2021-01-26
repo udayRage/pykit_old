@@ -207,9 +207,62 @@ class Tree(object):
 
 
 class Apriori(frequentPatterns):
+    """ Apriori main class
+
+        ...
+
+        Attributes
+        ----------
+        iFile : str
+            Input file name or path of the input file
+        minSup: float
+            UserSpecified minimum support value. It has to be given in terms of count of total number of transactions
+             in the input database/file
+        startTime:float
+            To record the start time of the mining process
+        endTime:float
+            To record the completion time of the mining process
+        finalPatterns: dict
+            Storing the complete set of patterns in a dictionary variable
+        oFile : str
+            Name of the output file to store complete set of frequent patterns
+        memoryUSS : float
+            To store the total amount of USS memory consumed by the program
+        memoryRSS : float
+            To store the total amount of RSS memory consumed by the program
+        Database : list
+            To store the complete set of transactions available in the input database/file
+
+        Methods
+        -------
+        startMine()
+            Mining process will start from here
+        getFrequentPatterns()
+            Complete set of patterns will be retrieved with this function
+        storePatternsInFile(oFile)
+            Complete set of frequent patterns will be loaded in to a output file
+        getPatternsInDataFrame()
+            Complete set of frequent patterns will be loaded in to a dataframe
+        getMemoryUSS()
+            Total amount of USS memory consumed by the mining process will be retrieved from this function
+        getMemoryRSS()
+            Total amount of RSS memory consumed by the mining process will be retrieved from this function
+        getRuntime()
+            Total amount of runtime taken by the mining process will be retrieved from this function
+        findDelimiter(line)
+            Identifying the delimiter of the input file
+        creatingItemSets(iFileName)
+            Storing the complete transactions of the database/input file in a database variable
+        frequentOneItem()
+            Generating one frequent patterns
+        dictKeysToInt(iList)
+            Converting dictionary keys to integer elements
+        subsetCreation(transaction, lengthSubset)
+            Generating subsets from the transactions of the database
+        aprioriGenerate(listOfItemSets, nLength)
+            Generation of the candidate patterns from the frequent patterns
     """
 
-    """
     minSup = float()
     startTime = float()
     endTime = float()
@@ -221,12 +274,12 @@ class Apriori(frequentPatterns):
     Database = []
 
     @staticmethod
-    def findCandidateList(line):
+    def findDelimiter(line):
         """Identifying the delimiter of the input file
 
             :param line: list of special characters may be used by a user to separate the items in a input file
             :type line: list of string
-            :returns: Delimited string used in the input file to separate each item
+            :returns: delimited string used in the input file to separate each item
             :rtype: string
             """
         listOfDelimiters = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
@@ -290,7 +343,7 @@ class Apriori(frequentPatterns):
                         # line.strip()
                         if lineNumber == 0:
                             lineNumber += 1
-                            delimiter = self.findCandidateList([*line])
+                            delimiter = self.findDelimiter([*line])
                             # li=[lineNumber]
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
