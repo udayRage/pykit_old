@@ -108,7 +108,7 @@ class Tree(object):
     def insertion(self, data, level):
         """Inserting data into a particular node in a particular level of the hash tree
 
-        :param data: list of item sets to be inserted into the hash tree
+        :param data: list of patterns to be inserted into the hash tree
         :type data: list
         :param level: level of the hash tree to identify the depth of the tree
         :type level: int
@@ -136,7 +136,7 @@ class Tree(object):
     def firstElement(self, data):
         """Inserting the first element into the hash tree
 
-        :param data: list of item sets to be inserted into the hash tree
+        :param data: list of patterns to be inserted into the hash tree
         :type data: list
         """
 
@@ -221,7 +221,7 @@ class Apriori(frequentPatterns):
     Database = []
 
     @staticmethod
-    def check(line):
+    def findCandidateList(line):
         """Identifying the delimiter of the input file
 
             :param line: list of special characters may be used by a user to separate the items in a input file
@@ -290,7 +290,7 @@ class Apriori(frequentPatterns):
                         # line.strip()
                         if lno == 0:
                             lno += 1
-                            delimiter = self.check([*line])
+                            delimiter = self.findCandidateList([*line])
                             # li=[lno]
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
@@ -335,9 +335,9 @@ class Apriori(frequentPatterns):
     def dictKeysToInt(iList):
         """Converting dictionary keys to integer elements
 
-        :param iList: Dictionary with item sets as keys with list of strings type and their support count as a value
+        :param iList: Dictionary with patterns as keys with list of strings type and their support count as a value
         :type iList: dict
-        :returns: a list of integer item sets to represent dictionary keys
+        :returns: a list of integer patterns to represent dictionary keys
         :rtype: list
         """
 
@@ -350,7 +350,7 @@ class Apriori(frequentPatterns):
 
     @staticmethod
     def subsetCreation(transaction, lengthSubset):
-        """Generating combination of item sets
+        """Generating combination of patterns
 
             :param transaction: Total list of transactions of the database, each with items
             :type transaction: list
@@ -368,17 +368,18 @@ class Apriori(frequentPatterns):
         return sorted(temp)
 
     def aprioriGenerate(self, listOfItemSets, nLength):
-        """Apriori Generation function along with item pruning of redundant items
+        """Generation of the candidate patterns from the frequent patterns
 
-            :param listOfItemSets: list of k-1 length item sets for generating k length length item sets
+            :param listOfItemSets: list of (nLength-1) size frequent patterns for generating nLength size candidate
+            patterns
             :type listOfItemSets: list
-            :param nLength: length of the next item sets
+            :param nLength: size of the candidate patterns to be generated
             :type nLength: int
-            :returns: list of final candidate item sets of length k after pruning k-1 length item sets
+            :returns: list of final candidate patterns of size nLength
             :rtype: list
             """
 
-        ck = []
+        candidateList = []
         # join step
         lengthK = len(listOfItemSets)
         for i in range(lengthK):
@@ -386,11 +387,11 @@ class Apriori(frequentPatterns):
                 list1 = list(listOfItemSets[i])[:nLength - 2]
                 list2 = list(listOfItemSets[j])[:nLength - 2]
                 if list1 == list2:
-                    ck.append(sorted(list(set(listOfItemSets[i]) | set(listOfItemSets[j]))))
-        # print(ck)
+                    candidateList.append(sorted(list(set(listOfItemSets[i]) | set(listOfItemSets[j]))))
+        # print(candidateList)
         # prune step
         finalCandidateK = []
-        for candidate in ck:
+        for candidate in candidateList:
             all_subsets = self.subsetCreation(candidate, nLength - 1)
             found = True
             for i in range(len(all_subsets)):
@@ -406,7 +407,7 @@ class Apriori(frequentPatterns):
         return sorted(finalCandidateK)
 
     def startMine(self):
-        """main program to start the operation"""
+        """Frequent pattern mining process will start from here"""
 
         # global  endTime, startTime, minSup, iFile
         global noOfChildren, maxRecordsInNonLeaf, itemSets
@@ -419,11 +420,12 @@ class Apriori(frequentPatterns):
             # quit()
         iFileName = self.iFile
         if self.minSup is None:
-            raise Exception("Please enter the Minimum Support")
+            raise Exception("Please enter the minimum support")
         # self.Database = []
         if self.minSup <= 0:
             raise Exception(
-                "Please enter the Minimum Support between (0,1) in percentage(%) calculated with database count")
+                "Please enter the minimum support in terms of count of total number of transactions in the input"
+                " database/file")
             # quit()
 
         self.creatingItemSets(iFileName)
@@ -436,7 +438,7 @@ class Apriori(frequentPatterns):
 
         # print(self.minSup)
         self.frequentOneItem()
-        # Sorting one frequent item sets
+        # Sorting one frequent patterns
         frequentOne = sorted([int(i) for i in self.finalPatterns.keys()])
 
         iteration = True
@@ -445,7 +447,7 @@ class Apriori(frequentPatterns):
         while iteration:
             # print("hello")
             if temp == 2:
-                # Generation of candidate two item sets and adding the same to Hash tree
+                # Generation of candidate two patterns and adding the same to Hash tree
                 comb = self.subsetCreation(frequentOne, 2)  # list(c(frequentOne, 2))
                 # print(comb)
             else:
@@ -463,7 +465,7 @@ class Apriori(frequentPatterns):
             if not comb:
                 break
             maintain = Tree()
-            # Inserting Candidate item sets into hash tree
+            # Inserting Candidate patterns into hash tree
             for i in range(len(comb)):
                 test = comb[i]  # sorted([int(t) for t in comb[i]])
                 maintain.firstElement(test)
@@ -474,14 +476,14 @@ class Apriori(frequentPatterns):
                     maintain.treeSearch(subSet[j])
 
             itemsAfterSupport = {keys: value for keys, value in itemSets.items() if value >= self.minSup}
-            # print(iter, "frequent item sets :", len(itemsAfterSupport))
+            # print(iter, "frequent patterns :", len(itemsAfterSupport))
             if itemsAfterSupport is None:
                 # iteration = False
                 break
             self.finalPatterns.update(itemsAfterSupport)
-            # print("Total frequent item sets are:", len(self.finalPatterns))
+            # print("Total frequent patterns are:", len(self.finalPatterns))
             if len(itemsAfterSupport) == 0 or len(itemsAfterSupport) == 1:
-                # print("Total frequent item sets are:", len(self.finalPatterns))
+                # print("Total frequent patterns are:", len(self.finalPatterns))
                 break
             listForNextIteration = self.dictKeysToInt(itemsAfterSupport)
             itemsAfterSupport.clear()
@@ -493,58 +495,66 @@ class Apriori(frequentPatterns):
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
         self.memoryRSS = process.memory_info().rss
-        print("Frequent item sets were generated successfully using Apriori Hash tree algorithm")
+        print("Frequent patterns were generated successfully using Apriori Hash tree algorithm")
 
     def getMemoryUSS(self):
-        """Total amount of USS memory consumed by the program will be retrieved from this function"""
+        """Total amount of USS memory consumed by the mining process will be retrieved from this function
+
+        :return: returning USS memory consumed by the mining process
+        :rtype: float
+        """
 
         return self.memoryUSS
 
     def getMemoryRSS(self):
-        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
+        """Total amount of RSS memory consumed by the mining process will be retrieved from this function
+
+        :return: returning RSS memory consumed by the mining process
+        :rtype: float
+        """
 
         return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm"""
-        # global endTime, startTime
+        """Calculating the total amount of runtime taken by the mining process
+
+
+        :return: returning total amount of runtime taken by the mining process
+        :rtype: float
+        """
+
         return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
+        """Storing final frequent patterns in a dataframe
 
-        # global finalPatterns
-        df = {}
-        # for x,y in self.finalPatterns.items():
+        :return: returning frequent patterns in a dataframe
+        :rtype: pd.DataFrame
+        """
+
+        dataFrame = {}
         data = []
         for a, b in self.finalPatterns.items():
             data.append([a, b])
-            # print(x)
-            # s = "output" + str(x)+".CSV"
-            df = pd.DataFrame(data, columns=['Patterns', 'Support'])
-        # print("Total frequent item sets are:", len(df))
-        return df
+            dataFrame = pd.DataFrame(data, columns=['Patterns', 'Support'])
+        return dataFrame
 
-    def storePatternsInFile(self, outputFile):
-        """ Function get the frequent patterns in to a outputFile
+    def storePatternsInFile(self, outFile):
+        """Complete set of frequent patterns will be loaded in to a output file
 
-        :param outputFile: Storing all frequent patterns in a file
-        :type outputFile: file
+        :param outFile: name of the output file
+        :type outFile: file
         """
-
-        # data = Path(sys.argv[1])
-        # global finalPatterns
-        writer = open(outputFile, 'w+')
+        self.oFile = outFile
+        writer = open(self.oFile, 'w+')
         for x, y in self.finalPatterns.items():
-            # s = "output" + str(x)
-            s1 = str(x) + ":" + str(y)
-            writer.write("%s \n" % s1)
-        # InFile()
+            patternsAndSupport = str(x) + ":" + str(y)
+            writer.write("%s \n" % patternsAndSupport)
 
     def getFrequentPatterns(self):
-        """Returning final frequent item sets in a Dictionary
+        """ Function to send the set of frequent patterns after completion of the mining process
 
+        :return: returning frequent patterns
+        :rtype: dict
         """
-        # global finalPatterns
-
         return self.finalPatterns
