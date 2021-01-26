@@ -18,11 +18,11 @@ class Tree(object):
         Attributes
         ----------
         child : list
-            storing each child of a tree as a subtree
+            Storing each child of a tree as a subtree
         data : list
-            storing the each item set as single value of the list
+            Storing the each pattern as a single value of the list
         leaf : bool
-            representing leaf node of the hash tree, so that further expansion will be possible from that child
+            Representing leaf node of the hash tree, so that further expansion will not be possible from that child
         level : int
             representing the level of the tree to identify the depth of the tree
 
@@ -66,7 +66,7 @@ class Tree(object):
     def setChildrenValue(self, dataList):
         """ Attach the list of data values into the children of the tree
 
-        :param dataList: item set in a list format
+        :param dataList: pattern in a list format
         :type dataList: list
         :return: returns the number of data elements in a child node of a hash tree as a rowcount
         :rtype: int
@@ -178,7 +178,7 @@ class Tree(object):
         """Searching a particular element in a hash tree and if it is identified we ll increment the count
             that element by 1 other returning the cursor to called function without any modification
 
-        :param element: list of item set to be searched in the hash tree
+        :param element: list of pattern to be searched in the hash tree
         :type element: list
         :return: returning non zero value to the called function after searching the particular element
         """
@@ -230,23 +230,23 @@ class Apriori(frequentPatterns):
             :rtype: string
             """
         listOfDelimiters = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
-        j = None
+        delimiter = None
         # print(line)
         for i in listOfDelimiters:
             if i in line:
                 return i
-        return j
+        return delimiter
 
     def creatingItemSets(self, iFileName):
-        """Creating a Database from input file and updating the same to global variable finalPatterns
+        """Storing the complete transactions of the database/input file in a database variable
 
-            :param iFileName: User given input file path with each row as a single transaction
+            :param iFileName: user given input file/input file path
             :type iFileName: str
             """
         # import pandas as pd
         # global Database
         self.Database = []
-        lno = 0
+        lineNumber = 0
         # data = []
         if isinstance(iFileName, list):
             self.Database = iFileName
@@ -288,18 +288,18 @@ class Apriori(frequentPatterns):
                 with open(iFileName, 'r', encoding='utf-8') as f:
                     for line in f:
                         # line.strip()
-                        if lno == 0:
-                            lno += 1
+                        if lineNumber == 0:
+                            lineNumber += 1
                             delimiter = self.findCandidateList([*line])
-                            # li=[lno]
+                            # li=[lineNumber]
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
                             self.Database.append([i.rstrip() for i in li1])
                             # else:
                             # self.Database.append(li)
-                            # data.append([lno,li1])
+                            # data.append([lineNumber,li1])
                         else:
-                            lno += 1
+                            lineNumber += 1
                             li = line.split(delimiter)
                             # if delimiter==',':
                             li1 = [i.rstrip() for i in li]
@@ -311,11 +311,9 @@ class Apriori(frequentPatterns):
         # else:
         # self.Database=iFileName['Transactions'].tolist()
 
-    # function to get frequent one item set
+    # function to get frequent one pattern
     def frequentOneItem(self):
-        """Generating One frequent items sets and updating the same to global variable finalPatterns
-
-        """
+        """Generating one frequent patterns"""
 
         candidate = {}
         # global finalPatterns, minSup, Database
@@ -335,9 +333,9 @@ class Apriori(frequentPatterns):
     def dictKeysToInt(iList):
         """Converting dictionary keys to integer elements
 
-        :param iList: Dictionary with patterns as keys with list of strings type and their support count as a value
+        :param iList: Dictionary with patterns as keys and their support count as a value
         :type iList: dict
-        :returns: a list of integer patterns to represent dictionary keys
+        :returns: list of integer patterns to represent dictionary keys
         :rtype: list
         """
 
