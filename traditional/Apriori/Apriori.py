@@ -11,7 +11,8 @@ class Apriori(frequentPatterns):
         iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value. It has to be given in terms of percentage within the interval (0, 100)
+            UserSpecified minimum support value. It has to be given in terms of count of total number of transactions
+             in the input database/file
         startTime:float
             To record the start time of the mining process
         endTime:float
@@ -96,8 +97,6 @@ class Apriori(frequentPatterns):
         with open(self.iFile, 'r') as f:
             self.transaction = [set([i.rstrip() for i in line.split(',')]) for line in f]
             f.close()
-        self.minSup = int(math.ceil(self.minSup * len(self.transaction)) / 100)
-
         itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
         items = [{i} for i in itemsList]
         itemsCount = len(items)
