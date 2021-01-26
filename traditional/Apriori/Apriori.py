@@ -11,11 +11,11 @@ class Apriori(frequentPatterns):
         iFile : str
             Input file name or path of the input file
         minSup: float
-            UserSpecified minimum support value and needs to be specified in the interval (0, 100)
+            UserSpecified minimum support value. It has to be given in terms of percentage within the interval (0, 100)
         startTime:float
-            To record the start time of the algorithm
+            To record the start time of the mining process
         endTime:float
-            To record the completion time of the algorithm
+            To record the completion time of the mining process
         finalPatterns: dict
             Storing the complete set of patterns in a dictionary variable
         oFile : str
@@ -34,13 +34,13 @@ class Apriori(frequentPatterns):
         storePatternsInFile(oFile)
             Complete set of frequent patterns will be loaded in to a output file
         getPatternsInDataFrame()
-            Complete set of frequent patterns will be loaded in to data frame
+            Complete set of frequent patterns will be loaded in to a dataframe
         getMemoryUSS()
-            Total amount of USS memory consumed by the program will be retrieved from this function
+            Total amount of USS memory consumed by the mining process will be retrieved from this function
         getMemoryRSS()
-            Total amount of RSS memory consumed by the program will be retrieved from this function
+            Total amount of RSS memory consumed by the mining process will be retrieved from this function
         getRuntime()
-            Total amount of runtime taken by the program will be retrieved from this function
+            Total amount of runtime taken by the mining process will be retrieved from this function
     """
 
     minSup = float()
@@ -54,11 +54,11 @@ class Apriori(frequentPatterns):
     transaction = []
 
     def candidate2Frequent(self, candidateList):
-        """Generates frequent item sets from the candidate item sets
+        """Generates frequent patterns from the candidate patterns
 
-        :param candidateList: Candidate item sets will be given as input
+        :param candidateList: Candidate patterns will be given as input
         :type candidateList: list
-        :return: returning set of all frequent item sets
+        :return: returning set of all frequent patterns
         :rtype: dict
         """
 
@@ -73,13 +73,13 @@ class Apriori(frequentPatterns):
 
     @staticmethod
     def frequent2Candidate(frequentList, length):
-        """Generates candidate item sets from the frequent item sets
+        """Generates candidate patterns from the frequent patterns
 
-        :param frequentList: set of all frequent item sets to generate candidate item sets of each of size is length
+        :param frequentList: set of all frequent patterns to generate candidate patterns of each of size is length
         :type frequentList: dict
-        :param length: size of each candidate item sets to be generated
+        :param length: size of each candidate patterns to be generated
         :type length: int
-        :return: set of candidate item sets in sorted order
+        :return: set of candidate patterns in sorted order
         :rtype: list
         """
 
@@ -90,7 +90,7 @@ class Apriori(frequentPatterns):
         return sorted(frequent2CandidateList)
 
     def startMine(self):
-        """ frequent pattern mining process will start from here"""
+        """ Frequent pattern mining process will start from here"""
 
         self.startTime = time.time()
         with open(self.iFile, 'r') as f:
@@ -109,7 +109,7 @@ class Apriori(frequentPatterns):
             self.finalPatterns.update(frequentSet)
             items = self.frequent2Candidate(frequentSet, i + 1)
             if len(items) == 0:
-                # print("End of Frequent Item Sets")
+                # print("End of frequent patterns")
                 break  # finish apriori
         self.endTime = time.time()
         process = psutil.Process(os.getpid())
@@ -118,22 +118,39 @@ class Apriori(frequentPatterns):
         print("Frequent patterns were generated successfully using Apriori algorithm ")
 
     def getMemoryUSS(self):
-        """Total amount of USS memory consumed by the program will be retrieved from this function"""
+        """Total amount of USS memory consumed by the mining process will be retrieved from this function
+        
+        :return: returning USS memory consumed by the mining process
+        :rtype: float
+        """
 
         return self.memoryUSS
 
     def getMemoryRSS(self):
-        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
+        """Total amount of RSS memory consumed by the mining process will be retrieved from this function
+        
+        :return: returning RSS memory consumed by the mining process
+        :rtype: float
+        """
 
         return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm"""
+        """Calculating the total amount of runtime taken by the mining process
+        
+        
+        :return: returning total amount of runtime taken by the mining process
+        :rtype: float
+        """
 
         return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
+        """Storing final frequent patterns in a dataframe
+
+        :return: returning frequent patterns in a dataframe
+        :rtype: pd.DataFrame
+        """
 
         dataFrame = {}
         data = []
@@ -143,9 +160,9 @@ class Apriori(frequentPatterns):
         return dataFrame
 
     def storePatternsInFile(self, outFile):
-        """Main apriori function receiving input file path, list of minimum support values, nodes, and nonLeaf
+        """Complete set of frequent patterns will be loaded in to a output file
 
-        :param outFile: .csv output file name
+        :param outFile: name of the output file
         :type outFile: file
         """
         self.oFile = outFile
@@ -155,9 +172,9 @@ class Apriori(frequentPatterns):
             writer.write("%s \n" % s1)
 
     def getFrequentPatterns(self):
-        """ Function to send the set of frequent item sets after completion of the mining process
+        """ Function to send the set of frequent patterns after completion of the mining process
 
-        :return: returning frequent item sets
+        :return: returning frequent patterns
         :rtype: dict
         """
         return self.finalPatterns
