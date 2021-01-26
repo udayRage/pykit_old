@@ -36,13 +36,13 @@ class Tree(object):
             Splitting of the nonLeaf node, if the number of elements in that node is greater than the
             maxRecordsInNonLeaf
         insertion(data, level)
-            Insertion of data in to the hash tree
+            Insertion of the data in to the hash tree
         firstElement(data)
             Inserting the first element into the hash tree
         treeDisplay(parent, length)
-            Displaying the content of the tree based on the total number of elements and parent node
+            To display the contents of the hash tree
         treeSearch(element)
-            Searching a particular element in a hash tree
+            Searching a particular pattern inside the hash tree
     """
 
     def __init__(self):
