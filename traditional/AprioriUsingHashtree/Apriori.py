@@ -54,7 +54,7 @@ class Tree(object):
     # Creating the children of a particular node
 
     def createChildren(self):
-        """Creating children to the hash tree total of noOfChildren"""
+        """Function to create a children of the hash tree"""
 
         global noOfChildren
         self.leaf = False
@@ -64,11 +64,11 @@ class Tree(object):
     # Adding values to the tree node
 
     def setChildrenValue(self, dataList):
-        """ Attach the list of data values into the children of the tree
+        """Storing the list of data into the child node of the hash tree
 
-        :param dataList: pattern in a list format
+        :param dataList: patterns in a list format
         :type dataList: list
-        :return: returns the number of data elements in a child node of a hash tree as a rowcount
+        :return: returns the number of data patterns in a child node of a hash tree
         :rtype: int
         """
         self.data.append(dataList)
@@ -84,10 +84,10 @@ class Tree(object):
 
     # splitting a node and adding the data elements to the particular child and making node data as null
     def splitting(self, level):
-        """No of elements in a particular tree is crosses the user specified limit splitting
-            is performed based on level attribute
+        """If the number of elements in the nonLeaf node is more than the maxRecordsInNonLeaf then this will be used for
+        splitting
 
-        :param level: level of the hash tree to identify the depth of the tree
+        :param level: to identify the depth of the tree
         :type level: int
 
         """
@@ -106,25 +106,25 @@ class Tree(object):
     # Inserting the data into tree other than root node
 
     def insertion(self, data, level):
-        """Inserting data into a particular node in a particular level of the hash tree
+        """Inserting data into the children of the hash tree
 
         :param data: list of patterns to be inserted into the hash tree
         :type data: list
-        :param level: level of the hash tree to identify the depth of the tree
+        :param level: to identify the depth of the tree
         :type level: int
         """
 
         global noOfChildren, maxRecordsInNonLeaf
         self.level = level
         # print(self.level)
-        data_length = len(data)
+        dataLength = len(data)
         indexing = int(data[level]) % noOfChildren
         if self.child[indexing].leaf is True:
             noOfRows = self.child[indexing].setChildrenValue(data)
             if noOfRows > maxRecordsInNonLeaf:
                 level += 1
-                if level < data_length:
-                    self.child[indexing].splitting(level)  # data_length as a parameter
+                if level < dataLength:
+                    self.child[indexing].splitting(level)  # dataLength as a parameter
                 # else:
                 #   pass
                 # print("We have reached the maximum level and There is will be No splitting")
@@ -141,7 +141,7 @@ class Tree(object):
         """
 
         level = 0
-        # data_length = len(data)
+        # dataLength = len(data)
         # print(self.level)
         if not self.child:
             First = int(data[level]) % noOfChildren
@@ -156,8 +156,8 @@ class Tree(object):
     def treeDisplay(self, parent, length):
         """Displaying the content of the hash tree
 
-        :param parent: Object reference of the parent node of the current node
-        :param length: Representing the depth of the hash tree
+        :param parent: object reference of the parent node of the current node
+        :param length: representing the depth of the hash tree
         :type length: int
         :return: returning zero after displaying all the elements of the hash tree
         """
@@ -184,9 +184,9 @@ class Tree(object):
         """
 
         if self.leaf is False:
-            indexing111 = element[self.level] % noOfChildren
-            # print(indexing111) # for displaying the path of the element evaluation
-            self.child[indexing111].treeSearch(element)
+            indexing = element[self.level] % noOfChildren
+            # print(indexing) # for displaying the path of the element evaluation
+            self.child[indexing].treeSearch(element)
         else:
             if not self.data:
                 return
