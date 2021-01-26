@@ -97,56 +97,43 @@ class Apriori(frequentPatterns):
             self.transaction = [set([i.rstrip() for i in line.split(',')]) for line in f]
             f.close()
         self.minSup = int(math.ceil(self.minSup * len(self.transaction)) / 100)
-        itemsList = sorted(list(set.union(*self.transaction)))
+
+        itemsList = sorted(list(set.union(*self.transaction)))  # because transaction is list
         items = [{i} for i in itemsList]
         itemsCount = len(items)
+
         for i in range(1, itemsCount):
             frequentSet = self.candidate2Frequent(items)
-            if len(frequentSet) == 0:
-                print("No frequent sets")
+            # if len(frequentSet) == 0:
+            #   print("No frequent sets")
             self.finalPatterns.update(frequentSet)
             items = self.frequent2Candidate(frequentSet, i + 1)
             if len(items) == 0:
-                print("End of Frequent Item Sets")
+                # print("End of Frequent Item Sets")
                 break  # finish apriori
         self.endTime = time.time()
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
         self.memoryRSS = process.memory_info().rss
+        print("Frequent patterns were generated successfully using Apriori algorithm ")
 
     def getMemoryUSS(self):
-        """Total amount of USS memory consumed by the program will be retrieved from this function
-
-        :return: returning total memory consumed in USS
-        :rtype: float
-        """
+        """Total amount of USS memory consumed by the program will be retrieved from this function"""
 
         return self.memoryUSS
 
     def getMemoryRSS(self):
-        """Total amount of RSS memory consumed by the program will be retrieved from this function
-
-        :return: returning total memory consumed in RSS
-        :rtype: float
-        """
+        """Total amount of RSS memory consumed by the program will be retrieved from this function"""
 
         return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm
-
-        :return: returning total runTime
-        :rtype: float
-        """
+        """Calculating the total amount of execution time taken by the Apriori algorithm"""
 
         return self.endTime - self.startTime
 
     def getPatternsInDataFrame(self):
-        """Storing final frequent item sets in a dataFrame, column names as Patterns and support respectively
-
-        :return: returning frequent item sets in a dataFrame
-        :rtype: pandas data frame
-        """
+        """Storing final frequent item sets in a dataframe and converting it to .csv file"""
 
         dataFrame = {}
         data = []
@@ -161,12 +148,11 @@ class Apriori(frequentPatterns):
         :param outFile: .csv output file name
         :type outFile: file
         """
-
         self.oFile = outFile
         writer = open(self.oFile, 'w+')
         for x, y in self.finalPatterns.items():
-            itemsAndSupport = str(x) + ":" + str(y)
-            writer.write("%s \n" % itemsAndSupport)
+            s1 = str(x) + ":" + str(y)
+            writer.write("%s \n" % s1)
 
     def getFrequentPatterns(self):
         """ Function to send the set of frequent item sets after completion of the mining process
@@ -174,5 +160,4 @@ class Apriori(frequentPatterns):
         :return: returning frequent item sets
         :rtype: dict
         """
-
         return self.finalPatterns
