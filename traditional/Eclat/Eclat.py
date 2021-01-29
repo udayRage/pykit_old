@@ -144,9 +144,7 @@ class Eclat(frequentPatterns):
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
                             self.Database.append([i.rstrip() for i in li1])
-                            # else:
-                            # self.Database.append(li)
-                            # data.append([lineNumber,li1])
+
                         else:
                             lineNumber += 1
                             li = line.split(delimiter)
@@ -157,10 +155,6 @@ class Eclat(frequentPatterns):
                 print("File Not Found")
                 quit()
 
-        # else:
-        # self.Database=iFileName['Transactions'].tolist()
-
-    # function to get frequent one pattern
     def frequentOneItem(self):
         """Generating one frequent patterns"""
 
@@ -196,7 +190,7 @@ class Eclat(frequentPatterns):
         return sorted(temp)
 
     def eclatGeneration(self, cList):
-        """It will generate the combinations of frequent items
+        """Eclat generation procedure
 
         :param cList :it represents the items with their respective transaction identifiers
         :type cList: dictionary
