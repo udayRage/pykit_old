@@ -1,87 +1,347 @@
-import sys
-import time
-import resource
-import os
-import psutil
-from collections import defaultdict
-iFile=sys.argv[1]
-oFile=sys.argv[2]
-minSup=int(sys.argv[3])
-class Eclat():
-    def __init__(self,data,output,minSup):
-        self.data=data
-        self.minSup=minSup
-        self.tidList={}
-        self.lno=0
-        self.totalItemsets={}
-        self.writer = open(output, 'w+')
-    def createItemsets(self):
-        with open(self.data,'r')as f:
-            for line in f:
-                l=line.split()
-                for i in range(1,len(l)):
-                    if l[i] in self.tidList:
-                        self.tidList[l[i]].append(int(l[0]))
-                    else:
-                        self.tidList[l[i]]=[int(l[0])]
-        self.tidList={k:v for k,v in self.tidList.items() if len(v)>=self.minSup}
-        for x,y in self.tidList.items():
-            self.totalItemsets[x]=len(y)
-    def generateTwoLengthFrequentPatterns(self,tids): 
-         tidList1={}
-         x=list(tids.keys())
-         for i in range(0,len(x)):
-             for j in range(i+1,len(x)):
-                 k=list(set(tids[x[i]]).intersection(set(tids[x[j]])))
-                 l=[]
-                 if(len(k)>=self.minSup):
-                     l+=x[i],x[j]
-                     l.sort()
-                     tidList1[tuple(l)]=k
-         return tidList1
-         
+from traditional.abstractClass.abstractFrequentPatterns import *
 
-    def generateAllFrequentPatterns(self,itemsets):
-        tidList1={}
-        x=list(itemsets.keys())
-        for i in range(0,len(x)):
-            for j in range(i+1,len(x)):
-                k=list(set(itemsets[x[i]]).intersection(set(itemsets[x[j]])))
-                l=[]
-                l+=x[i]
-                l+=x[j]
-                if(len(k)>=self.minSup):
-                    l.sort()
-                    if tuple(l) not in tidList1:
-                        tidList1[tuple(set(l))]=k
+
+class Eclat(frequentPatterns):
+    """ ECLAT main class
+
+            ...
+
+            Attributes
+            ----------
+            iFile : str
+                Input file name or path of the input file
+            minSup: float
+                UserSpecified minimum support value. It has to be given in terms of count of total number of
+                transactions
+                 in the input database/file
+            startTime:float
+                To record the start time of the mining process
+            endTime:float
+                To record the completion time of the mining process
+            finalPatterns: dict
+                Storing the complete set of patterns in a dictionary variable
+            oFile : str
+                Name of the output file to store complete set of frequent patterns
+            memoryUSS : float
+                To store the total amount of USS memory consumed by the program
+            memoryRSS : float
+                To store the total amount of RSS memory consumed by the program
+            Database : list
+                To store the complete set of transactions available in the input database/file
+
+            Methods
+            -------
+            startMine()
+                Mining process will start from here
+            getFrequentPatterns()
+                Complete set of patterns will be retrieved with this function
+            storePatternsInFile(oFile)
+                Complete set of frequent patterns will be loaded in to a output file
+            getPatternsInDataFrame()
+                Complete set of frequent patterns will be loaded in to a dataframe
+            getMemoryUSS()
+                Total amount of USS memory consumed by the mining process will be retrieved from this function
+            getMemoryRSS()
+                Total amount of RSS memory consumed by the mining process will be retrieved from this function
+            getRuntime()
+                Total amount of runtime taken by the mining process will be retrieved from this function
+            findDelimiter(line)
+                Identifying the delimiter of the input file
+            creatingItemSets(iFileName)
+                Storing the complete transactions of the database/input file in a database variable
+            frequentOneItem()
+                Generating one frequent patterns
+            dictKeysToInt(iList)
+                Converting dictionary keys to integer elements
+            eclatGeneration(cList)
+                It will generate the combinations of frequent items
+            generateFrequentPatterns(tidList)
+                It will generate the combinations of frequent items from a list of items
+    """
+
+    minSup = float()
+    startTime = float()
+    endTime = float()
+    finalPatterns = {}
+    iFile = " "
+    oFile = " "
+    memoryUSS = float()
+    memoryRSS = float()
+    Database = []
+
+    @staticmethod
+    def findDelimiter(line):
+        """Identifying the delimiter of the input file
+
+            :param line: list of special characters may be used by a user to separate the items in a input file
+            :type line: list of string
+            :returns: delimited string used in the input file to separate each item
+            :rtype: string
+            """
+        listOfDelimiters = [',', '*', '&', ' ', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
+        delimiter = None
+        # print(line)
+        for i in listOfDelimiters:
+            if i in line:
+                return i
+        return delimiter
+
+    def creatingItemSets(self, iFileName):
+        """Storing the complete transactions of the database/input file in a database variable
+
+            :param iFileName: user given input file/input file path
+            :type iFileName: str
+            """
+        # import pandas as pd
+        # global Database
+        self.Database = []
+        lineNumber = 0
+        # data = []
+        if isinstance(iFileName, list):
+            self.Database = iFileName
+        if isinstance(iFileName, pd.DataFrame):
+            if iFileName.empty:
+                print("its empty..")
+                quit()
+            i = iFileName.columns.values.tolist()
+            if 'Transactions' in i:
+                self.Database = iFileName['Transactions'].tolist()
+            if 'Patterns' in i:
+                self.Database = iFileName['Patterns'].tolist()
+
+        if '.CSV' in iFileName:
+            file1 = pd.read_csv(iFileName)
+            columns = list(file1.head(0))
+            if "Patterns" in columns:
+                with open(iFileName, newline='') as csvFile:
+                    data = csv.DictReader(csvFile)
+                    for row in data:
+                        listValue = row['Patterns']
+                        l1 = listValue.replace("[", "")
+                        l2 = l1.replace("]", "")
+                        li = list(l2.split(","))
+                        li1 = [int(i) for i in li]
+                        self.Database.append(li1)
+            if "Transactions" in columns:
+                with open(iFileName, newline='') as csvFile:
+                    data = csv.DictReader(csvFile)
+                    for row in data:
+                        listValue = row['Transactions']
+                        l1 = listValue.replace("[", "")
+                        l2 = l1.replace("]", "")
+                        li = list(l2.split(","))
+                        li1 = [int(i) for i in li]
+                        self.Database.append(li1)
+        else:
+            try:
+                with open(iFileName, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        # line.strip()
+                        if lineNumber == 0:
+                            lineNumber += 1
+                            delimiter = self.findDelimiter([*line])
+                            # li=[lineNumber]
+                            li = line.split(delimiter)
+                            li1 = [i.rstrip() for i in li]
+                            self.Database.append([i.rstrip() for i in li1])
+                            # else:
+                            # self.Database.append(li)
+                            # data.append([lineNumber,li1])
+                        else:
+                            lineNumber += 1
+                            li = line.split(delimiter)
+                            # if delimiter==',':
+                            li1 = [i.rstrip() for i in li]
+                            self.Database.append(li1)
+            except IOError:
+                print("File Not Found")
+                quit()
+
+        # else:
+        # self.Database=iFileName['Transactions'].tolist()
+
+    # function to get frequent one pattern
+    def frequentOneItem(self):
+        """Generating one frequent patterns"""
+
+        candidate = {}
+        # global finalPatterns, minSup, Database
+        # self.minSup = self.minSup
+        for i in range(len(self.Database)):
+            for j in range(len(self.Database[i])):
+                if self.Database[i][j] not in candidate:
+                    candidate[self.Database[i][j]] = [i]
+                else:
+                    candidate[self.Database[i][j]] += [i]
+        self.finalPatterns = {keys: value for keys, value in candidate.items() if len(value) >= self.minSup}
+
+    # def less_items():
+    #    pass
+
+    @staticmethod
+    def dictKeysToInt(iList):
+        """Converting dictionary keys to integer elements
+
+        :param iList: Dictionary with patterns as keys and their support count as a value
+        :type iList: dict
+        :returns: list of integer patterns to represent dictionary keys
+        :rtype: list
+        """
+
+        temp = []
+        for ite in iList.keys():
+            ite = [int(i) for i in ite.strip('[]').split(',')]
+            temp.append(ite)
+            # print(sorted(temp))
+        return sorted(temp)
+
+    def eclatGeneration(self, cList):
+        """It will generate the combinations of frequent items
+
+        :param cList :it represents the items with their respective transaction identifiers
+        :type cList: dictionary
+        :return: returning transaction dictionary
+        :rtype: dict
+        """
+        # to generate all
+        tidList = {}
+        x = list(cList.keys())
+        for i in range(0, len(x)):
+            for j in range(i + 1, len(x)):
+                # print(c[x[i]],c[x[j]])
+                k = list(set(cList[x[i]]).intersection(set(cList[x[j]])))
+                itemList = []
+                itemList += x[i]
+                itemList += x[j]
+                if len(k) >= self.minSup:
+                    itemList.sort()
+                    if tuple(itemList) not in tidList:
+                        tidList[tuple(set(itemList))] = k
+        return tidList
+
+    def generateFrequentPatterns(self, tidList):
+        """It will generate the combinations of frequent items from a list of items
+
+        :param tidList :it represents the items with their respective transaction identifiers
+        :type tidList: dictionary
+        :return: returning transaction dictionary
+        :rtype: dict
+        """
+        tidList1 = {}
+        if len(tidList) == 0:
+            print("There are no more candidate sets")
+        else:
+            x = list(tidList.keys())
+            for i in range(0, len(x)):
+                for j in range(i + 1, len(x)):
+                    k = list(set(tidList[x[i]]).intersection(set(tidList[x[j]])))
+                    itemList = []
+                    if len(k) >= self.minSup:
+                        itemList += x[i], x[j]
+                        itemList.sort()
+                        tidList1[tuple(itemList)] = k
         return tidList1
+
     def startMine(self):
-        startTime=time.time()
-        self.createItemsets()
-        #To generate 2-length itemsets
-        patterns=self.generate2Length_FrequentPatterns(self.tidList)
-        for x,y in patterns.items():
-            if x not in self.totalItemsets:
-                self.totalItemsets[x]=len(y)
-        while(1):
-            # to generate all patterns recursively
-            patterns=self.generateAllFrequentPatterns(patterns)
-            for x,y in patterns.items():
-                if x not in self.totalItemsets:
-                    self.totalItemsets[x]=len(y)
-            if(len(patterns)==0):
+        """Frequent pattern mining process will start from here"""
+
+        # global items_sets, endTime, startTime
+        self.startTime = time.time()
+        if self.iFile is None:
+            raise Exception("Please enter the file path or file name:")
+        iFileName = self.iFile
+        if self.minSup is None:
+            raise Exception("Please enter the Minimum Support")
+        # Database = []
+        if self.minSup <= 0:
+            raise Exception(
+                "Please enter the minimum support in terms of count of total number of transactions in the input"
+                " database/file")
+
+        self.creatingItemSets(iFileName)
+
+        if self.minSup > len(self.Database):
+            raise Exception("Please enter the minSup less than the database size")
+
+        # self.minSup = (len(self.Database) * self.minSup)
+        self.frequentOneItem()
+        frequentSet = self.generateFrequentPatterns(self.finalPatterns)
+
+        for x, y in frequentSet.items():
+            if x not in self.finalPatterns:
+                self.finalPatterns[x] = y
+        while 1:
+            frequentSet = self.eclatGeneration(frequentSet)
+            for x, y in frequentSet.items():
+                if x not in self.finalPatterns:
+                    self.finalPatterns[x] = y
+            if len(frequentSet) == 0:
                 break
-        for x,y in self.totalItemsets.items():
-            s=str(x)+":"+str(y)
-            self.writer.write("%s \n" %s)
-        endTime=time.time()
-        print("total itemsets:",len(self.totalItemsets))
-        print("time:",endTime-startTime ,":(in Sec)")
+        # print("Frequent patterns were generated successfully using Eclat algorithm")
+        self.endTime = time.time()
         process = psutil.Process(os.getpid())
-        memory = process.memory_full_info().uss
-        memory_in_MB = memory / (1024 * 1024)
-        print("Memory Space:",memory_in_MB ,":(in MBs)")
-        
-        
-e=Eclat(iFile,oFile,minSup)
-e.startMine()
+        self.memoryUSS = process.memory_full_info().uss
+        self.memoryRSS = process.memory_info().rss
+        print("Frequent patterns were generated successfully using Eclat algorithm")
+
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the mining process will be retrieved from this function
+
+        :return: returning USS memory consumed by the mining process
+        :rtype: float
+        """
+
+        return self.memoryUSS
+
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the mining process will be retrieved from this function
+
+        :return: returning RSS memory consumed by the mining process
+        :rtype: float
+        """
+
+        return self.memoryRSS
+
+    def getRuntime(self):
+        """Calculating the total amount of runtime taken by the mining process
+
+
+        :return: returning total amount of runtime taken by the mining process
+        :rtype: float
+        """
+
+        return self.endTime - self.startTime
+
+    def getPatternsInDataFrame(self):
+        """Storing final frequent patterns in a dataframe
+
+        :return: returning frequent patterns in a dataframe
+        :rtype: pd.DataFrame
+        """
+
+        dataFrame = {}
+        data = []
+        for a, b in self.finalPatterns.items():
+            data.append([a, b])
+            dataFrame = pd.DataFrame(data, columns=['Patterns', 'Support'])
+        return dataFrame
+
+    def storePatternsInFile(self, outFile):
+        """Complete set of frequent patterns will be loaded in to a output file
+
+        :param outFile: name of the output file
+        :type outFile: file
+        """
+        self.oFile = outFile
+        writer = open(self.oFile, 'w+')
+        for x, y in self.finalPatterns.items():
+            patternsAndSupport = str(x) + ":" + str(y)
+            writer.write("%s \n" % patternsAndSupport)
+
+    def getFrequentPatterns(self):
+        """ Function to send the set of frequent patterns after completion of the mining process
+
+        :return: returning frequent patterns
+        :rtype: dict
+        """
+        return self.finalPatterns
