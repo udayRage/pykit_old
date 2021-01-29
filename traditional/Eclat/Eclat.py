@@ -12,8 +12,7 @@ class Eclat(frequentPatterns):
                 Input file name or path of the input file
             minSup: float
                 UserSpecified minimum support value. It has to be given in terms of count of total number of
-                transactions
-                 in the input database/file
+                transactions in the input database/file
             startTime:float
                 To record the start time of the mining process
             endTime:float
@@ -144,7 +143,9 @@ class Eclat(frequentPatterns):
                             li = line.split(delimiter)
                             li1 = [i.rstrip() for i in li]
                             self.Database.append([i.rstrip() for i in li1])
-
+                            # else:
+                            # self.Database.append(li)
+                            # data.append([lineNumber,li1])
                         else:
                             lineNumber += 1
                             li = line.split(delimiter)
@@ -155,6 +156,10 @@ class Eclat(frequentPatterns):
                 print("File Not Found")
                 quit()
 
+        # else:
+        # self.Database=iFileName['Transactions'].tolist()
+
+    # function to get frequent one pattern
     def frequentOneItem(self):
         """Generating one frequent patterns"""
 
@@ -190,7 +195,7 @@ class Eclat(frequentPatterns):
         return sorted(temp)
 
     def eclatGeneration(self, cList):
-        """Eclat generation procedure
+        """It will generate the combinations of frequent items
 
         :param cList :it represents the items with their respective transaction identifiers
         :type cList: dictionary
@@ -199,18 +204,18 @@ class Eclat(frequentPatterns):
         """
         # to generate all
         tidList = {}
-        x = list(cList.keys())
-        for i in range(0, len(x)):
-            for j in range(i + 1, len(x)):
-                # print(c[x[i]],c[x[j]])
-                k = list(set(cList[x[i]]).intersection(set(cList[x[j]])))
+        key = list(cList.keys())
+        for i in range(0, len(key)):
+            for j in range(i + 1, len(key)):
+                # print(c[key[i]],c[key[j]])
+                intersectionList = list(set(cList[key[i]]).intersection(set(cList[key[j]])))
                 itemList = []
-                itemList += x[i]
-                itemList += x[j]
-                if len(k) >= self.minSup:
+                itemList += key[i]
+                itemList += key[j]
+                if len(intersectionList) >= self.minSup:
                     itemList.sort()
                     if tuple(itemList) not in tidList:
-                        tidList[tuple(set(itemList))] = k
+                        tidList[tuple(set(itemList))] = intersectionList
         return tidList
 
     def generateFrequentPatterns(self, tidList):
@@ -225,15 +230,15 @@ class Eclat(frequentPatterns):
         if len(tidList) == 0:
             print("There are no more candidate sets")
         else:
-            x = list(tidList.keys())
-            for i in range(0, len(x)):
-                for j in range(i + 1, len(x)):
-                    k = list(set(tidList[x[i]]).intersection(set(tidList[x[j]])))
+            key = list(tidList.keys())
+            for i in range(0, len(key)):
+                for j in range(i + 1, len(key)):
+                    intersectionList = list(set(tidList[key[i]]).intersection(set(tidList[key[j]])))
                     itemList = []
-                    if len(k) >= self.minSup:
-                        itemList += x[i], x[j]
+                    if len(intersectionList) >= self.minSup:
+                        itemList += key[i], key[j]
                         itemList.sort()
-                        tidList1[tuple(itemList)] = k
+                        tidList1[tuple(itemList)] = intersectionList
         return tidList1
 
     def startMine(self):
