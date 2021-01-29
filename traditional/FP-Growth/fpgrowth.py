@@ -1,199 +1,24 @@
-import time
-from pathlib import Path
-import sys
-import csv
-import numpy
-import pandas as pd
-from collections import defaultdict
-from itertools import combinations as c
-import os
-import os.path
-import psutil
-
-start_time = float
-end_time = float
-
-#denoting a class for a node
-class Node:
-    def __init__(self):
-        self.itemid=-1
-        self.counter=1
-        self.parent=None
-        self.child=[]
-        self.nodeLink=None
-    def getChild(self,id1):
-    	# denoting function to return the node with item name as input
-        for i in self.child:
-            if(i.itemid==id1):
-                return i
-        return None
-class Tree:
-    """
-        A class used to represent the fpgrowth tree structure
-
-        ...
-
-        Attributes
-        ----------
-        child : list
-            storing each child of a tree as a subtree
-        data : list
-            stroing the each itemset as single value of the list
-
-        Methods
-        -------
-        createHeaderList(items,minSup)
-            takes items only which are greater than minSup and sort the items in ascending order
-        addTransaction(transaction)
-            creating transaction as a branch in fptree
-        fixNodeLinks(item,newNode)
-            To create the link for nodes with same item
-        printTree(Node)
-            gives the details of node in fpgrowth tree
-        addPrefixPath(prefix,mapSupport,minSup)
-           It takes the items in prefix pattern whose support is >=minSup and construct a subtree
-    """
-    def __init__(self):
-        """
-        Parameters
-        ----------
-        headerList : list
-            storing the list of items in tree sorted in ascending of their supports
-        mapItemNodes : dictionary
-            stroing the nodes with same item name
-        mapItemLastNodes : dictionary
-            representing the map that indicates the last node for each item
-        root : Node
-            representing the root Node in a tree
-        """
-        self.headerList=[]
-        self.mapItemNodes={}
-        self.mapItemLastNodes={}
-        self.root=Node()
-
-    def addTransaction(self,transaction):
-        """adding transaction into tree
-
-        :param transaction: it represents the one transactions in database
-        :type(transaction): list
-        """
-
-    	# This method taken a transaction as input and returns the tree
-        current=self.root
-        for i in transaction:
-            child=current.getChild(i)
-            if(child==None):
-                newNode=Node()
-                newNode.itemid=i
-                newNode.parent=current
-                current.child.append(newNode)
-                self.fixNodeLinks(i,newNode)
-                current=newNode
-            else:
-                child.counter+=1
-                current=child
-    def fixNodeLinks(self,item,newNode):
-        """Fixing node link for the newNode that inserted into fptree
-
-        :param item: it represents the item of newNode
-        :type item : int
-        :param newNode : it represents the newNode that inserted in fptree
-        :type newNode : Node
-        
-        """
-        if item in self.mapItemLastNodes.keys():
-            lastNode=self.mapItemLastNodes[item]
-            lastNode.nodeLink=newNode
-        self.mapItemLastNodes[item]=newNode
-        if item not in self.mapItemNodes.keys():
-            self.mapItemNodes[item]=newNode
-            
-    def printTree(self,root):
-        """Print the details of Node in fptree
-        
-        :param root: it represents the Node in fptree
-        :type root: Node
-        
-        This method is to find the details of parent,children,support of Node
-        """
-
-    	# this method is used print the details of tree
-        if root.child==[]:
-            return
-        else:
-            for i in root.child: 
-                print(i.itemid,i.counter,i.parent.item)
-                self.printTree(i)
-    def update(self,header,u1):
-        """To update the headerList 
-
-        :param mapsup: it represents the header list
-        :type mapsup: list
-        :param u1: the list of items
-        :type u1 : list
-        """
-
-        t1=[]
-        for i in header:
-            if i in u1:
-                t1.append(i)
-        return t1
-    def createHeaderList(self,mapSupport,min_sup):
-        """To create the headerList 
-
-        :param mapSupport : it represents the items with their supports
-        :type mapsup : dictionary
-        :param min_sup : it represents the minSup
-        :param min_sup : float
-        """
-    	#the fptree always maintains the header table to start the mining from leaf nodes
-        t1=[]
-        for x,y in mapSupport.items():
-            if y>=min_sup:
-                t1.append(x)
-        mapsup=[k for k,v in sorted(mapSupport.items(),key=lambda x: x[1],reverse=True)]
-        self.headerList=self.update(mapsup,t1)
-    def addPrefixPath(self,prefix,mapSupportBeta,min_sup):
-        """To construct the conditional tree with prefix paths of a node in fptree 
-
-        :param prefix : it represents the prefix items of a Node
-        :type prefix : list
-        :param mapSupportBeta : it represents the items with their supports
-        :param mapSupportBeta : dictionary
-        :param min_sup : to check the item meets with minSup
-        :param min_sup : float
-        """
-    	#this method is used to add prefix paths in conditional trees of fptree
-        pathCount=prefix[0].counter
-        current=self.root
-        prefix.reverse()
-        for i  in range(0,len(prefix)-1):
-            pathItem=prefix[i]
-            #pathCount=mapSupportBeta.get(pathItem.itemid)
-            if(mapSupportBeta.get(pathItem.itemid)>=min_sup):
-                child=current.getChild(pathItem.itemid)
-                if(child==None):
-                    newNode=Node()
-                    newNode.itemid=pathItem.itemid
-                    newNode.parent=current
-                    newNode.counter=pathCount
-                    current.child.append(newNode)
-                    current=newNode
-                    self.fixNodeLinks(pathItem.itemid,newNode)
-                else:
-                    child.counter+=pathCount
-                    current=child
+from abstract import *
+import tree as T
         
         
-        
-class Fpgrowth():
+class Fpgrowth(frequentPatterns):
     
-    def __init__(self,data,minSup):
-        """
+    """
         Parameters
         ----------
-        data : file
-            The user given database file
+        iFile : file
+            Name of the Input file to mine complete set of frequent patterns
+        oFile : file
+            Name of the output file to store complete set of frequent patterns
+        memoryUSS : float
+            To store the total amount of USS memory consumed by the program
+        memoryRSS : float
+            To store the total amount of RSS memory consumed by the program
+        startTime:float
+            To record the start time of the mining process
+        endTime:float
+            To record the completion time of the mining process
         minSup : float
             The user given minSup
         Database : list
@@ -206,25 +31,64 @@ class Fpgrowth():
             it represensts the Tree class
         itemsetCount : int
             it represenst the total no of patterns 
-        final_frequent_items : int
+        finalPatterns : dict
             it represents to store the patterns
         itemsetBuffer : list
             it represenst the store the items in mining 
         maxPatternLength : int
            it represenst the constraint for pattern length
+
+        Methods
+        -------
+        startMine()
+            Mining process will start from here
+        getFrequentPatterns()
+            Complete set of patterns will be retrieved with this function
+        storePatternsInFile(oFile)
+            Complete set of frequent patterns will be loaded in to a output file
+        getPatternsInDataFrame()
+            Complete set of frequent patterns will be loaded in to a dataframe
+        getMemoryUSS()
+            Total amount of USS memory consumed by the mining process will be retrieved from this function
+        getMemoryRSS()
+            Total amount of RSS memory consumed by the mining process will be retrieved from this function
+        getRuntime()
+            Total amount of runtime taken by the mining process will be retrieved from this function
+        check(line)
+            To check the delimeter used in the user input fileTempBuffer,s,position,prefix,prefixLength
+        creatingItemsets(fileName)
+            Scans the dataset or dataframes and stores in list format
+        frequentOneItem()
+            Extracts the one-frequent patterns from transactions
+        saveAllCombination(TempBuffer,s,position,prefix,prefixLength)
+            Forms all the combinations between prefix and TempBuffer lists with support(s)
+        saveItemset(pattern,support)
+            Stores all the frequent patterns with their respective support
+        fpGrowthGenerate(fptree,prefix,mapSupport)
+            Mining the frequent patterns by forming conditional fptrees to particular prefix item.
+            mapSupport represents the 1-length items with their respective support
+
+
         """
-        self.minSup=minSup
-        self.data=data
-        self.Database=[]
-        self.mapSupport={}
-        self.lno=0
-        self.tree=Tree()
-        self.itemsetBuffer=None
-        self.fpNodeTempBuffer=[]
-        self.itemsetCount=0
-        self.maxPatternLength=1000
-        self.final_frequent_itemsets={}
-    def Check(self, line):
+
+    startTime = float()
+    endTime = float()
+    minSup=float()
+    finalPatterns = {}
+    iFile = " "
+    oFile = " "
+    memoryUSS = float()
+    memoryRSS = float()
+    Database=[]
+    mapSupport={}
+    lno=0
+    tree=T.Tree()
+    itemsetBuffer=None
+    fpNodeTempBuffer=[]
+    itemsetCount=0
+    maxPatternLength=1000
+    
+    def check(self, line):
         """Identifying the delimeter of the input file
 
             :param line: list of special charcters may be used by a user to seperate the items in a input file
@@ -240,8 +104,8 @@ class Fpgrowth():
         return j
 
 
-    def creating_itemsets(self, iFileName):
-        """Creating a Database from input file and updating the same to global variable final_frequent_itemsets
+    def creatingItemsets(self, iFileName):
+        """Creating a Database from input file and updating the same to global variable finalPatterns
 
             :param iFileName: User given input file path with each row as a single transaction
             :type iFileName: str
@@ -296,7 +160,7 @@ class Fpgrowth():
                         line.strip()
                         if lno==0:
                             lno+=1
-                            delimeter=self.Check(line)
+                            delimeter=self.check(line)
                             #li=[lno]
                             li=line.split(delimeter)
                             if delimeter==',':
@@ -322,17 +186,16 @@ class Fpgrowth():
             #Database=iFileName['Transactions'].tolist()
 
     # function to get frequent one itemset
-    def frequent_one_item(self):
+    def frequentOneItem(self):
         """Generating One frequent items sets
 
         :param minSup: User specified minimum support value as a thershold
         :type minSup: float
-        :param Global variable final_frequent_itemsets: Dictionary with itemsets as keys with list of strings type and their support count as
+        :param Global variable finalPatterns: Dictionary with itemsets as keys with list of strings type and their support count as
             value
-        :type final_frequent_itemsets: defaultdict
+        :type finalPatterns: defaultdict
         """
     	# scans the database and finds single items whose support>=minSup 
-        self.mapSupport={}
         for i in self.Database:
             for j in i:
                 if j not in self.mapSupport:
@@ -348,7 +211,7 @@ class Fpgrowth():
         :type prefixLength : int
         :param support: the support of a pattern
         :type support :  int
-        :The frequent patterns are update into global variable final_frequent_itemsets
+        :The frequent patterns are update into global variable finalPatterns
         """
     	# this method taken pattern,patternLength to save itemset
         global patterns
@@ -356,8 +219,8 @@ class Fpgrowth():
         for i in range(prefixLength):
             l.append(prefix[i])
         self.itemsetCount+=1
-        self.final_frequent_itemsets[tuple(l)]=support
-    def saveAllcombinations(self,TempBuffer,s,position,prefix,prefixLength):
+        self.finalPatterns[tuple(l)]=support
+    def saveAllCombinations(self,TempBuffer,s,position,prefix,prefixLength):
         """Generating all the combinations for items in single branch in fptree
 
         :param TempBuffer: items in a list
@@ -369,7 +232,7 @@ class Fpgrowth():
         :type prefix : list
         :param prefixlength : the length of prefix
         :type prefixLength :int
-        :type final_frequent_itemsets: defaultdict
+        :type finalPatterns: defaultdict
         
         """
         max1=1<<position
@@ -383,7 +246,7 @@ class Fpgrowth():
                     support=TempBuffer[j].counter
             self.saveItemset(prefix,newprefixLength,s)
             
-    def fpgrowth_generate(self,tree,prefix,prefixLength,mapSupport):
+    def fpGrowthGenerate(self,fptree,prefix,prefixLength,mapSupport):
         """Mining the fp tree
 
         :param tree: it represents the fptree
@@ -402,10 +265,10 @@ class Fpgrowth():
         singlePath=True
         position=0
         s=0
-        if(len(tree.root.child)>1):
+        if(len(fptree.root.child)>1):
             singlePath=False
         else:
-            currentNode=tree.root.child[0]
+            currentNode=fptree.root.child[0]
             while(True):
                 if(len(currentNode.child)>1):
                     singlePath=False
@@ -417,17 +280,17 @@ class Fpgrowth():
                     break
                 currentNode=currentNode.child[0]
         if singlePath==True:
-            self.saveAllcombinations(self.fpNodeTempBuffer,s,position,prefix,prefixLength)
+            self.saveAllCombinations(self.fpNodeTempBuffer,s,position,prefix,prefixLength)
         else:
-            for i in reversed(tree.headerList):
+            for i in reversed(fptree.headerList):
                 item=i
                 support=mapSupport[i]
                 betaSupport=support
                 prefix.insert(prefixLength,item)
-                self.saveItemset(prefix,prefixLength+1,support)
+                self.saveItemset(prefix,prefixLength+1,betaSupport)
                 if(prefixLength+1<self.maxPatternLength):
                     prefixPaths=[]
-                    path=tree.mapItemNodes.get(item)
+                    path=fptree.mapItemNodes.get(item)
                     mapSupportBeta={}
                     while(path!=None):
                         if(path.parent.itemid!=-1):
@@ -444,25 +307,13 @@ class Fpgrowth():
                                 parent1=parent1.parent
                             prefixPaths.append(prefixPath)
                         path=path.nodeLink
-                    treeBeta=Tree()
+                    treeBeta=T.Tree()
                     for i in prefixPaths:
                         treeBeta.addPrefixPath(i,mapSupportBeta,self.minSup)
                     if(len(treeBeta.root.child)>0):
                         treeBeta.createHeaderList(mapSupportBeta,self.minSup)
-                        self.fpgrowth_generate(treeBeta,prefix,prefixLength+1,mapSupportBeta) 
-    def updateTransaction(self,mapsup,transaction):
-        """To update the list
+                        self.fpGrowthGenerate(treeBeta,prefix,prefixLength+1,mapSupportBeta)
 
-        :param mapsup: it represents the header list
-        :type mapsup: list
-        :param transaction: the list of items
-        :type transaction : list
-        """
-        t1=[]
-        for i in mapsup:
-            if i in transaction:
-                t1.append(i)
-        return t1
     def startMine(self):
         """main program to start the operation
 
@@ -474,12 +325,11 @@ class Fpgrowth():
     	#secondly it sorts the transactions with descending supports of items in transactions
     	#with sorted transactions we build tree and store the header list to tree with ascending order of 1-length frequent items.
     	# lastly we call fpgrowth method for mining the patterns from tree
-        global Database,memory,totalTime,patterns,start_time,end_time
-        start_time = time.time()
-        if self.data == None:
+        self.startTime = time.time()
+        if self.iFile == None:
             raise Exception("Please enter the file path or file name:")
             quit()
-        iFileName = self.data
+        iFileName = self.iFile
         if self.minSup == None:
             raise Exception("Please enter the Minimum Support")
         #Database = []
@@ -487,12 +337,12 @@ class Fpgrowth():
             raise Exception("Please enter the Minimum Support between (0,1) in percentage(%) calculated with database count")
             quit()
 
-        self.creating_itemsets(iFileName)
+        self.creatingItemsets(iFileName)
 
         if self.minSup > len(self.Database):
             raise Exception("Please enter the minSup in range between 0 to 1")
             quit()
-        self.frequent_one_item()
+        self.frequentOneItem()
         self.minSup = (len(self.Database) * self.minSup)
         self.mapSupport={k: v for k, v in self.mapSupport.items() if  v>= self.minSup}
         mapsup=[k for k,v in sorted(self.mapSupport.items(),key=lambda x: x[1],reverse=True)]
@@ -505,123 +355,73 @@ class Fpgrowth():
             transaction.sort(key=lambda val:self.mapSupport[val],reverse=True)
             self.tree.addTransaction(transaction)
         self.tree.createHeaderList(self.mapSupport,self.minSup)
-        #self.tree.printTree(self.tree.root)
         if(len(self.tree.headerList)>0):
             self.itemsetBuffer=[]
-            self.fpgrowth_generate(self.tree,self.itemsetBuffer,0,self.mapSupport)
+            self.fpGrowthGenerate(self.tree,self.itemsetBuffer,0,self.mapSupport)
         print("Frequent itemsets were generated successfully using FPGrowth algorithm")
-        end_time = time.time()
-    def getMemory(self):
-        """Calculating the amount of memory consumed by the Apriori algorithm
-
-        """
-        #import psutil
-        #global minSup
+        self.endTime = time.time()
         process = psutil.Process(os.getpid())
-        memory = process.memory_full_info().uss  # process.memory_info().rss
-        memory_in_MB = memory / (1024 * 1024)
-        return memory_in_MB
-        #print(memory_in_MB)  # in bytes
-        #print("Total Memory is:", memory_in_MB)
+        self.memoryUSS = process.memory_full_info().uss
+        self.memoryRSS = process.memory_info().rss
+    
+    def getMemoryUSS(self):
+        """Total amount of USS memory consumed by the mining process will be retrieved from this function
 
+        :return: returning USS memory consumed by the mining process
+        :rtype: float
+        """
+
+        return self.memoryUSS
+
+    def getMemoryRSS(self):
+        """Total amount of RSS memory consumed by the mining process will be retrieved from this function
+
+        :return: returning RSS memory consumed by the mining process
+        :rtype: float
+        """
+
+        return self.memoryRSS
 
     def getRuntime(self):
-        """Calculating the total amount of execution time taken by the Apriori algorithm
-
-        """
-        global end_time, start_time
-        return (end_time - start_time)
+        """Calculating the total amount of runtime taken by the mining process
 
 
-
-
-    def getPatternInDf(self):
-        """Storing final frequent itemsets in a dataframe and converting it to .csv file
-
-        :param global patterns: Dictionary with itemsets as keys with list of strings type and
-                their support count as a value
-        :type patterns: dict
-        """
-        #import pandas as pd
-        #global final_frequent_itemsets
-        df = {}
-        #for x,y in self.final_frequent_itemsets.items():
-        data=[]
-        for a,b in self.final_frequent_itemsets.items():
-            data.append([a,b])
-           #print(x)
-           #s = "output" + str(x)+".CSV"
-            df = pd.DataFrame(data, columns=['Patterns','Support'])
-        #print("Total frequent itemsets are:", len(df))
-        return df
-
-
-
-
-    def getPatternsInFile(self, outputfile):
-        """Main apriori function receiving input file path, list of minimum support values, nodes, and nonleaf
-
-        :param data: .csv input file path
-        :type data: path
-        :param listing: list of integers with minimum support
-        :type listing: list
-        :param nodes: Number of children of the hash tree
-        :type nodes: int
-        :param nonleaf: Maximum number of elements allowed in a non leaf node
-        :type nonleaf: int
+        :return: returning total amount of runtime taken by the mining process
+        :rtype: float
         """
 
-        #data = Path(sys.argv[1])
-        #global final_frequent_itemsets
-        writer = open(outputfile, 'w+')
-        for x, y in self.final_frequent_itemsets.items():
-            #s = "output" + str(x)
+        return self.endTime - self.startTime
+
+    def getPatternsInDataFrame(self):
+        """Storing final frequent patterns in a dataframe
+
+        :return: returning frequent patterns in a dataframe
+        :rtype: pd.DataFrame
+        """
+
+        dataFrame = {}
+        data = []
+        for a, b in self.finalPatterns.items():
+            data.append([a, b])
+            dataFrame = pd.DataFrame(data, columns=['Patterns', 'Support'])
+        return dataFrame
+
+    def storePatternsInFile(self, outFile):
+        """Complete set of frequent patterns will be loaded in to a output file
+
+        :param outFile: name of the output file
+        :type outFile: file
+        """
+        self.oFile = outFile
+        writer = open(self.oFile, 'w+')
+        for x, y in self.finalPatterns.items():
             s1 = str(x) + ":" + str(y)
             writer.write("%s \n" % s1)
-        #InFile()
 
-    def getFPs(self):
-        """Returing final frequent itemsets in a Dictionary
+    def getFrequentPatterns(self):
+        """ Function to send the set of frequent patterns after completion of the mining process
 
-        Returns
-        -------
-        defaultdict
-
+        :return: returning frequent patterns
+        :rtype: dict
         """
-        return self.final_frequent_itemsets
-
-    def getStatsInFile(self,statsfile):
-        """ Printing the statistics of the database into a Statistics file
-        :param global Database variable: Storing the data in to a Database variable
-        :type Database: defaultdict
-        """
-        #global Database
-        sum1 = 0
-        min1 = 999999
-        max1 = -1
-        tot = 0
-        si = []
-        l1 = 0
-        s = statsfile
-        writer1 = open(s, 'w+')
-        for line in self.Database:
-            l = line
-            for i in l:
-                if i not in si:
-                    si.append(i)
-            if (len(l) > max1):
-                max1 = len(l)
-            sum1 += len(l)
-            if (len(l) < min1):
-                min1 = len(l)
-            tot += len(l)
-        s = "Total number of transactions:" + str(len(self.Database))
-        writer1.write("%s \n" % s)
-        s = "Total number of items:" + str(len(si))
-        writer1.write("%s \n" % s)
-        s = "Minimum length of a transaction: " + str(min1)
-        writer1.write("%s \n" % s)
-        s = "Maximum length of a transaction: " + str(max1)
-        writer1.write("%s \n" % s)
-        s = "Avg length of a transaction: " + str(tot / len(self.Database))
-        writer1.write("%s \n" % s)
+        return self.finalPatterns
