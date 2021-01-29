@@ -443,10 +443,10 @@ class Apriori(frequentPatterns):
         # prune step
         finalCandidateK = []
         for candidate in candidateList:
-            all_subsets = self.subsetCreation(candidate, nLength - 1)
+            allSubsets = self.subsetCreation(candidate, nLength - 1)
             found = True
-            for i in range(len(all_subsets)):
-                value = list(sorted(all_subsets[i]))
+            for i in range(len(allSubsets)):
+                value = list(sorted(allSubsets[i]))
                 if value not in listOfItemSets:
                     found = False
                     break
@@ -482,7 +482,7 @@ class Apriori(frequentPatterns):
         self.creatingItemSets(iFileName)
 
         if self.minSup > len(self.Database):
-            raise Exception("Please enter the minSup in range between 0 to 1")
+            raise Exception("Please enter the minSup less than the database size")
             # quit()
 
         # self.minSup = (len(self.Database) * self.minSup)
