@@ -1,0 +1,7 @@
+Utility database which is going to be loaded must contain 3 tuples (Here each tuple should be separated by ':') such as,
+ collection of items (separated by ','), total utility of the transaction, and collection of utility of each item
+ (separated by ',')
+
+for example: a,b,c,d:20:5,5,6,4
+             a,d,e:15:5,4,6
+             c,d,e:16:6,4,6
