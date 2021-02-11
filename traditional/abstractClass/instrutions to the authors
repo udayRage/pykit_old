@@ -1,0 +1,7 @@
+Temporal database which is going to be loaded must contain 2 tuples such as, Time stamp and set of items separated by a
+delimiter (say ",") (i.e., first column should represent the temporal information and remaining columns represents the
+set of items)
+
+for example: 1,a,b,c,d
+             2,a,d,e
+             4,c,d,e
