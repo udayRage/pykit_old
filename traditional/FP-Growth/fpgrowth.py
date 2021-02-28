@@ -1,4 +1,4 @@
-from abstract import *
+from traditional.abstractClass.abstractFrequentPatterns import *
 
 
 class Node:
