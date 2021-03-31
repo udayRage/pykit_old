@@ -520,7 +520,7 @@ class PPPgrowth:
             s1 = str(x) + ":" + str(y)
             writer.write("%s \n" % s1)
 
-    def getFrequentPatterns(self):
+    def getPartialPeriodicPatterns(self):
         """ Function to send the set of frequent patterns after completion of the mining process
 
         :return: returning frequent patterns
@@ -535,7 +535,7 @@ if __name__ == "__main__":
     ap.periodicSupport = float(sys.argv[3])
     ap.period= float(sys.argv[4])
     ap.startMine()
-    frequentPatterns = ap.getFrequentPatterns()
+    frequentPatterns = ap.getPartialPeriodicPatterns()
     print("Total number of Frequent Patterns:", len(frequentPatterns))
     ap.storePatternsInFile(sys.argv[2])
     memUSS = ap.getMemoryUSS()
