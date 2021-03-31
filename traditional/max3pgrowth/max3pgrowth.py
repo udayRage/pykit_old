@@ -346,7 +346,7 @@ maximalTree = MPTree()
 maximalItemsets = []
 
 
-class PPPgrowth:
+class max3pGrowth:
 
     periodicSupport = float()
     period = float()
@@ -640,7 +640,7 @@ class PPPgrowth:
 
 
 if __name__ == "__main__":
-    ap = PPPgrowth()
+    ap = max3pGrowth()
     ap.iFile = sys.argv[1]
     ap.oFile = sys.argv[2]
     ap.periodicSupport = float(sys.argv[3])
