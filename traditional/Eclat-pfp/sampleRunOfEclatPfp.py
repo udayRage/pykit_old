@@ -1,6 +1,6 @@
-import Eclat_pfp as Ap
+import eclat_pfp as Ap
 
-apri = Ap.Eclat_pfp(r"/home/apiiit-rkv/Downloads/aprioriFinal/sample", 90, 20)
+apri = Ap.Eclat_pfp(r"/home/apiiit-rkv/Downloads/aprioriFinal/sample", 0.2, 0.9)
 
 apri.startMine()
 
