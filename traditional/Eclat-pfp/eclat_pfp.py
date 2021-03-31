@@ -1,5 +1,5 @@
 import sys
-from abstractP import *
+from traditional.abstractClass.abstractPeriodicPatterns import *
 
 
 class Eclat_pfp(frequentPatterns):
