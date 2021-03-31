@@ -395,7 +395,7 @@ class Pfgrowth:
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
         self.memoryRSS = process.memory_info().rss
-        print("Frequent patterns were generated successfully using Pfgrowth algorithm ")
+        print("Periodic-frequent patterns were generated successfully using Pfgrowth algorithm ")
 
     def getMemoryUSS(self):
         """Total amount of USS memory consumed by the mining process will be retrieved from this function
