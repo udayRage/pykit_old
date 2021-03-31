@@ -2,7 +2,7 @@ import sys
 from abstractP import *
 
 
-class Eclat_pfp():
+class Eclat_pfp(frequentPatterns):
     """
         Parameters
         ----------
@@ -142,13 +142,13 @@ class Eclat_pfp():
 
 
                     """
-        if(prefix==None):
-            prefix=suffix
-        else:
-            prefix=prefix+suffix
-        val=self.getPer_Sup(tidsetx)
-        if val[0]>=self.minSup and val[1]<=self.maxPer:
-            self.finalPatterns[tuple(prefix)] = val
+         if(prefix==None):
+             prefix=suffix
+         else:
+             prefix=prefix+suffix
+         val=self.getPer_Sup(tidsetx)
+         if val[0]>=self.minSup and val[1]<=self.maxPer:
+             self.finalPatterns[tuple(prefix)] = val
     def Generation(self,prefix,itemsets,tidsets):
         """
             here equivalence class is followed  and checks for the patterns generated for periodic frequent patterns.
