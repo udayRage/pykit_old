@@ -574,7 +574,7 @@ class max3pGrowth:
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
         self.memoryRSS = process.memory_info().rss
-        print("Frequent patterns were generated successfully using max3Pgrowth algorithm ")
+        print("Maximal Periodic-Frequent patterns were generated successfully using max3Pgrowth algorithm ")
 
     def getMemoryUSS(self):
         """Total amount of USS memory consumed by the mining process will be retrieved from this function
