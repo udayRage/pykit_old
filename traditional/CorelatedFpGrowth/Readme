@@ -1,0 +1,117 @@
+How to execute the code:
+We have created an abstract class named “freqeuntPatterns” inside the “abstractFrequentPatterns.py” python file.
+Therefore, every program has to import this file and needs to extend the abstract class as follows: from traditional.abstractClass.abstractFrequentPatterns
+import *
+class spatialEclat():
+	Complete code along with the implementation of the given abstract methods and variables available in the abstract class ‘frequentPatterns’.
+1. Frequent Pattern Mining (FPM) Process:
+	1.1.Import our package and initialize the method called 'spatialEclat' using the input file path/input file and minimum support (It has to be given in terms of count of total number of transactions in the input database/file).
+	1.2.Then call the method 'startMine' using the following command 
+		import SpatialEclat as Myap
+		fp= Myap.spatialEclat("input filename","neighbours" ,minimumsupport)
+		fp.startMine()
+		output is displayed as follows:
+		 Spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+		For example:
+			If we execute the following command:
+			import spatialEclat as Myap
+			fp = Myap.spatialEclat("input.txt","neighb.txt","output.txt",5)
+			fp.startMine()
+			output is displayed as follows:
+			 Spatial Frequent patterns were generated successfully using spatialEclatalgorithm.
+2. To get the frequent patterns along with their support count:
+	2.1.Complete the FPM Process mentioned in (1)
+	2.2.Then call the method 'getFrequentPatterns' using the following command:
+		import spatialEclatas Myap
+		fp= Myap.spatialEclat("input filename","neighbours" ,minimumsupport)
+		fp.startMine()
+		variable = fp.getFrequentPatterns()
+		output is displayed as follows:
+		 Frequent patterns were generated successfully using spatialEclat algorithm.
+	  All the Frequent patterns will be stored in a dictionary, with patterns as keys and support count as value and returned 	    to the called function.
+		For example:
+			If we execute the following command:
+			import spatialEclat as Myap
+			fp = Myap.spatialEclat("input.txt","neighb.txt",5)
+			fp.startMine()
+			frequentPatterns = fp.getFrequentPatterns()
+			output is displayed as follows:
+			 spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+			 All the Frequent patterns will be stored in a dictionary, with patterns as keys and support count as value and assigned to the variable called 'frequentPatterns.'
+3. To get the frequent patterns along with their support count in a file:
+	3.1.Complete the FPM Process mentioned in (1)
+	3.2.Then call the method 'storePatternsInFile' using the following command:
+		import spatialEclat as Myap
+		fp= Myap.Fprgowth("input.txt","neighb.txt",5)
+		fp.startMine()
+		fp.storePatternsInFile("output file")
+			output is displayed as follows:
+		 spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+	 All the Frequent patterns will be stored in a file named as “output file"
+	For example:
+		If we execute the following command:
+		import spatialEclat as Myap
+		fp = Myap.spatialEclat(r" transactional_T10I4D100K.csv", 1000)
+		fp.startMine()
+		fp.storePatternsInFile("sampleoutput")
+		output is displayed as follows:
+		  spatial Frequent patterns were generated successfully using spatialEclatalgorithm.
+		 All the Frequent patterns will be stored in a file named as‘sampleoutput.’
+4. If we want to know the amount of USS memory consumed by the spatialEclat algorithm:
+	4.1.Complete the FPM Process mentioned in (1)
+	4.2.Then call the method 'getMemoryUSS' using the following command:
+		import spatialEclat as Myap
+		fp = Myap.spatialEclat("input.txt","neighb.txt",5)
+		fp.startMine()
+		variable = fp.getMemoryUSS()
+			output is displayed as follows:
+		  spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+		 Total amount of USS memory consumed by the program will be computed and returned to the called function.
+			For example:
+			If we execute the following command:
+			import spatialEclat as Myap
+			fp= Myap.spatialEclat("input.txt","neighb.txt",5)
+			fp.startMine()
+			memoryUSS = fp.getMemoryUSS()
+			output is displayed as follows:
+			 spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+			 Total amount of USS memory consumed by the program will be computed and returned to the variable called ' memoryUSS.'
+5. If we want to know the amount of RSS memory consumed by the spatialEclat
+algorithm:
+	5.1.Complete the FPM Process mentioned in (1)
+	5.2.Then call the method 'getMemoryRSS' using the following command:
+		import spatialEclat as Myap
+		fp = Myap.spatialEclat("input.txt","neighb.txt",5)
+		fp.startMine()
+		variable = fp.getMemoryRSS()
+		output is displayed as follows:
+		 spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+	 Total amount of RSS memory consumed by the program will be computed and returned to the called function.
+	For example:
+		If we execute the following command:
+		import spatialEclat as Myap
+		fp = Myap.spatialEclat("input.txt","neighb.txt",5)
+		fp.startMine()
+		memoryRSS = fp.getMemoryRSS()
+		output is displayed as follows:
+		 spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+	  Total amount of RSS memory consumed by the program will be computed and returned to the variable called ' memoryRSS.'
+6. If we want to know the runtime taken by the spatialEclat algorithm created by us:
+	6.1.Complete the FPM Process mentioned in (1)
+	6.2.Then call the method 'getRuntime' using the following command:
+		import spatialEclat as Myap
+		fp = Myap.spatialEclat("input.txt","neighb.txt",5)
+		fp.startMine()
+		variable = fp.getRuntime()
+		output is displayed as follows:
+		  spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+		 Total runtime taken by the program in seconds will be computed and returned to the called function.
+		For example:
+			If we execute the following command:
+		import spatialEclat as Myap
+		fp= Myap.spatialEclat("input.txt","neighb.txt",5)
+		fp.startMine()
+		run = fpgetRuntime()
+		output is displayed as follows:
+		 Spatial Frequent patterns were generated successfully using spatialEclat algorithm.
+		 Total runtime taken by the program in seconds will be computed and returned to the variable called 'run.'
