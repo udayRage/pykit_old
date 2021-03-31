@@ -129,7 +129,7 @@ class periodicFrequentPatterns(ABC):
         pass
 
     @abstractmethod
-    def getPeriodicFrequentPatterns(self):
+    def getPartialPeriodicPatterns(self):
         """Complete set of periodicFrequent patterns generated will be retrieved from this function"""
 
         pass
