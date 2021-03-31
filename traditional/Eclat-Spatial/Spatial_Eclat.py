@@ -396,15 +396,11 @@ class Eclat():
         """
         return self.finalPatterns
 if __name__ == "__main__":
-	ap=Eclat()
-	ap.iFile=sys.argv[1]
-	ap.nFileName=sys.argv[2]
-	ap.oFile=sys.argv[3]
-	ap.minSup=int(sys.argv[4])
+	ap=Eclat(sys.argv[1],sys.argv[2],int(sys.argv[3]))
 	ap.startMine()
 	frequentPatterns = ap.getFrequentPatterns()
 	print("Total number of Spatial Frequent Patterns:", len(frequentPatterns))
-	ap.storePatternsInFile(sys.argv[3])
+	ap.storePatternsInFile(sys.argv[4])
 	memUSS = ap.getMemoryUSS()
 	print("Total Memory in USS:", memUSS)
 	memRSS = ap.getMemoryRSS()
