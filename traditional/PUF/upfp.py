@@ -297,7 +297,7 @@ class Tree(object):
             self.remove_node(i)
 
 
-class PUFgrowth():
+class Upfpgrowth():
     """
             A class used to represent the frequentPatternGrowth tree structure
 
@@ -568,7 +568,7 @@ class PUFgrowth():
 
 
 if __name__ == "__main__":
-    ap = PUFgrowth()
+    ap = Upfpgrowth()
     ap.iFile = sys.argv[1]
     ap.oFile = sys.argv[2]
     ap.minSup = float(sys.argv[3])
