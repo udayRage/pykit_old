@@ -1,4 +1,4 @@
-import max3pGrowth as Ap
+import max3pgrowth as Ap
 
 apri = Ap.max3pGrowth()
 apri.iFile = "T10I4D100K.txt"
