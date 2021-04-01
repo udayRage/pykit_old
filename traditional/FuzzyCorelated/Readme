@@ -1,0 +1,59 @@
+How to execute the code:
+We have created an abstract class named “freqeuntPatterns” inside the “abstractFrequentPatterns.py” python file.
+Therefore, every program has to import this file and needs to extend the abstract class as follows: from traditional.abstractClass.abstractFrequentPatterns
+import *
+class AlgoCorelFFI ():
+	Complete code along with the implementation of the given abstract methods and variables available in the abstract class ‘fuzzyfrequentPatterns’.
+1. Frequent Pattern Mining (FPM) Process:
+	1.1.Import our package and initialize the method called 'Fuzzy Frequent' using the input file path/input file and minimum support (It has to be given in terms of count of total number of transactions in the input database/file).
+	1.2.Then call the method 'startMine' using the following command 
+		import Fuzzy Frequent as Myap
+		fp= Myap.AlgoCorelFFI("input","output",minsup,ratio)
+		fp.startMine()
+		output is displayed as follows:
+		Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+		For example:
+			If we execute the following command:
+			import Fuzzy Frequent as Myap
+			fp = Myap.AlgoCorelFFI("inp","outp",4,0.2)
+			fp.startMine()
+			output is displayed as follows:
+			Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+2. If we want to know the amount of RSS memory consumed by the Fuzzy Frequent algorithm:
+	2.1.Complete the FPM Process mentioned in (1)
+	2.2.Then call the method 'getMemoryRSS' using the following command:
+		import Fuzzy Frequent as Myap
+		fp = Myap.AlgoCorelFFI("input","output",minsup,ratio)
+		fp.startMine()
+		variable = fp.getMemoryRSS()
+		output is displayed as follows:
+		Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+	 Total amount of RSS memory consumed by the program will be computed and returned to the called function.
+	For example:
+		If we execute the following command:
+		import Fuzzy Frequent as Myap
+		fp = Myap.AlgoCorelFFI("inp","outp",4,0.2)
+		fp.startMine()
+		memoryRSS = fp.getMemoryRSS()
+		output is displayed as follows:
+		Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+	  Total amount of RSS memory consumed by the program will be computed and returned to the variable called ' memoryRSS.'
+3. If we want to know the runtime taken by the Fuzzy Frequent algorithm created by us:
+	3.1.Complete the FPM Process mentioned in (1)
+	3.2.Then call the method 'getRuntime' using the following command:
+		import Fuzzy Frequent as Myap
+		fp = Myap.AlgoCorelFFI("input","output",minsup,ratio)
+		fp.startMine()
+		variable = fp.getRuntime()
+		output is displayed as follows:
+		Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+		 Total runtime taken by the program in seconds will be computed and returned to the called function.
+		For example:
+			If we execute the following command:
+		import Fuzzy Frequent as Myap
+		fp= Myap.AlgoCorelFFI("inp","outp",4,0.2)
+		fp.startMine()
+		run = fpgetRuntime()
+		output is displayed as follows:
+		Fuzzy-Frequent patterns were generated successfully using Fuzzy Frequent algorithm.
+		 Total runtime taken by the program in seconds will be computed and returned to the variable called 'run.'
