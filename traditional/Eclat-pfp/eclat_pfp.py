@@ -1,8 +1,8 @@
 import sys
-from traditional.abstractClass.abstractPeriodicPatterns import *
+from abstractP import *
 
 
-class Eclat_pfp(frequentPatterns):
+class Eclatpfp():
     """
         Parameters
         ----------
@@ -53,6 +53,15 @@ class Eclat_pfp(frequentPatterns):
             Total amount of RSS memory consumed by the mining process will be retrieved from this function
         getRuntime()
             Total amount of runtime taken by the mining process will be retrieved from this function
+        scanDatabase()
+            Scan the database and store the items with their timestamps which are periodic frequent 
+        getPeriodAndSupport()
+            Calculates the support and period for a list of timestamps.
+        Generation()
+            Used to implement prefix class equivalence method to generate the periodic patterns recursively
+        startMine()
+            Main program
+        
         
 
 
@@ -73,7 +82,7 @@ class Eclat_pfp(frequentPatterns):
     tidlist = {}
     lno = 0
 
-    def getPer_Sup(self, tids):
+    def getSupportAndPeriod(self, tids):
         """
             calculates the support and periodicity with list of timestamps
 
@@ -94,6 +103,21 @@ class Eclat_pfp(frequentPatterns):
             sup += 1
         per = max(per, self.lno - cur)
         return [sup, per]
+        
+    def findDelimiter(self, line):
+        """Identifying the delimiter of the input file
+
+            :param line: list of special characters may be used by a user to split the items in a input file
+            :type line: list of string
+            :returns: Delimited string used in the input file to split each item
+            :rtype: string
+            """
+        l = [',', '*', '&', '', '%', '$', '#', '@', '!', '    ', '*', '(', ')']
+        j = None
+        for i in l:
+            if i in line:
+                return i
+        return j
 
     def scanDatabase(self):
         """
@@ -104,10 +128,13 @@ class Eclat_pfp(frequentPatterns):
 
 
                     """
+        delimiter = str()
         with open(self.iFile, 'r') as f:
             for line in f:
                 self.lno+=1
-                s=line.split()
+                if self.lno==1:
+                    delimiter = self.findDelimiter([*line])
+                s=[i.strip(delimiter) for i in line.split(delimiter)]
                 n=self.lno
                 for i in range(1,len(s)):
                     si=s[i]
@@ -125,8 +152,6 @@ class Eclat_pfp(frequentPatterns):
         self.maxPer=(self.maxPer*self.lno)
         print(self.minSup,self.maxPer)
         self.mapSupport={k: [v[0],v[1]] for k,v in self.mapSupport.items() if v[0]>=self.minSup and v[1]<=self.maxPer}
-        #for x,y in self.mapSupport.items():
-            #print(x,y)
         plist=[key for key,value in sorted(self.mapSupport.items(), key=lambda x:(x[1][0],x[0]),reverse=True)]
         return plist
     def save(self,prefix,suffix,tidsetx):
@@ -146,7 +171,7 @@ class Eclat_pfp(frequentPatterns):
              prefix=suffix
          else:
              prefix=prefix+suffix
-         val=self.getPer_Sup(tidsetx)
+         val=self.getSupportAndPeriod(tidsetx)
          if val[0]>=self.minSup and val[1]<=self.maxPer:
              self.finalPatterns[tuple(prefix)] = val
     def Generation(self,prefix,itemsets,tidsets):
@@ -280,7 +305,7 @@ class Eclat_pfp(frequentPatterns):
         return self.finalPatterns
                     
 if __name__ == "__main__":
-    ap = Eclat_pfp()
+    ap = Eclatpfp()
     ap.iFile = sys.argv[1]
     ap.oFile = sys.argv[2]
     ap.maxPer = float(sys.argv[4])
