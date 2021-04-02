@@ -396,7 +396,7 @@ class Pufgrowth():
         for x, y in periods.items():
             if y >= self.minSup:
                 self.finalPatterns[tuple(x)] = y
-        print("Frequent patterns were generated from uncertain databases successfully using PUF algorithm")
+        print("Frequent patterns were generated from uncertain databases successfully using PUF algorithm in uncertain databases")
         self.endTime = time.time()
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
