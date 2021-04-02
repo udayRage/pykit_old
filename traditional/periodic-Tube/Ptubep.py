@@ -1,8 +1,6 @@
 import sys
-from abstractUP import *
-import time
-import os
-import psutil
+from traditonal.abstractClass.abstarctPeriodicPatterns import *
+
 
 
 minSup = float()
