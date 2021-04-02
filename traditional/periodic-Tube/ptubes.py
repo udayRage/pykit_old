@@ -569,7 +569,7 @@ class Ptubes():
         for x, y in periods.items():
             if y >= minSup:
                 self.finalPatterns[tuple(x)] = y
-        print("Frequent patterns were generated successfully using frequentPatternGrowth algorithm")
+        print("Periodic-Frequent patterns were generated successfully using periodic-TubeS algorithm in uncertain databases")
         self.endTime = time.time()
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
