@@ -1,7 +1,6 @@
 import sys
-from abstractP import *
-import os
-import psutil
+from traditional.abstractClass.abstractPeriodicPatterns import *
+
 
 minSup = float()
 maxPer = float()
