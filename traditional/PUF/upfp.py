@@ -498,7 +498,7 @@ class Upfpgrowth():
         for x, y in periods.items():
             if y >= minSup:
                 self.finalPatterns[tuple(x)] = y
-        print("Periodic frequent patterns were generated successfully using PUF algorithm")
+        print("Periodic frequent patterns were generated successfully using UPUF algorithm in uncertain databases")
         self.endTime = time.time()
         process = psutil.Process(os.getpid())
         self.memoryUSS = process.memory_full_info().uss
