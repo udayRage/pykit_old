@@ -3,7 +3,6 @@ import puf as Ap
 apri = Ap.Pufgrowth()
 apri.iFile = "tubeSample"
 apri.minSup = 0.1
-apri.maxPer = 0.02
 
 apri.startMine()
 
